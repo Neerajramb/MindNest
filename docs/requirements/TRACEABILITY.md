@@ -11,10 +11,10 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 |---|---|---|---|---|---|
 | FR-001 | Authenticate patients and caregivers | AUTH-01, AUTH-03 | accounts | TC-001, TC-002 | Tested (API) |
 | FR-002 | Separate patient/caregiver privileges | AUTH-02, AUTH-04, BR-01 | accounts, care, core.scope | TC-003, TC-016 | Tested (API) |
-| FR-003 | Patient views daily schedule | SCH-02 | scheduling | AC-02 | Not started |
-| FR-004 | Caregiver CRUD schedule items | SCH-01, SCH-03 | scheduling | AC-02 | Not started |
-| FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Not started |
-| FR-006 | Caregiver medication records and schedules | MED-01, MED-02, MED-05 | scheduling | TC-004 | Not started |
+| FR-003 | Patient views daily schedule | SCH-02 | scheduling | AC-02 | Tested (API) |
+| FR-004 | Caregiver CRUD schedule items | SCH-01, SCH-03 | scheduling | AC-02 | Tested (API) |
+| FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Tested (API) |
+| FR-006 | Caregiver medication records and schedules | MED-01, MED-02, MED-05 | scheduling | TC-004 | Tested (API) |
 | FR-007 | Patient asks assistant about schedule/reminders/info | RAG-01, RAG-06 | assistant | AC-08 | Not started |
 | FR-008 | Capture camera input for object/face | OBJ-01, FACE-01 | mobile, objects_ai, people | TC-006, TC-008 | Not started |
 | FR-009 | Detect configured everyday objects | OBJ-02, OBJ-03 | objects_ai | TC-006 | Not started |
@@ -33,14 +33,14 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | FR-022 | Caregiver alert on violation | SAFE-04, SAFE-05 | safety, notifications | TC-015, AC-09 | Not started |
 | FR-023 | Well-being audio | WELL-01..03 | wellbeing | — | Not started |
 | FR-024 | Activity/event logs | CARE-06 | audit | — | Not started |
-| FR-025 | Caregiver notifications for important events | CARE-03 | notifications | — | Not started |
+| FR-025 | Caregiver notifications for important events | CARE-03 | notifications | — | API done |
 
 ## Caregiver dashboard (SRS 4.10)
 
 | ID | Requirement | Screens | Status |
 |---|---|---|---|
 | CARE-01 | View patient status | C-02, C-03 | Not started |
-| CARE-02 | View schedule and reminder info | C-03, C-07 | Not started |
+| CARE-02 | View schedule and reminder info | C-03, C-07 | API done |
 | CARE-03 | Receive configured alerts | C-11 | Not started |
 | CARE-04 | Manage geofences | C-10 | Not started |
 | CARE-05 | Manage familiar people | C-08 | Not started |
@@ -79,7 +79,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 |---|---|---|---|
 | AC-01 | Authentication | — | Tested (API) |
 | AC-02 | Schedule | F | Not started |
-| AC-03 | Medication reminder | D | Not started |
+| AC-03 | Medication reminder | D | Tested (API) |
 | AC-04 | Object finder | A | Not started |
 | AC-05 | Face recognition | B | Not started |
 | AC-06 | RAG | C | Not started |
