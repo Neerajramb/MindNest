@@ -6,7 +6,7 @@ import { colors } from '@/ui/theme';
 
 /**
  * Persistent patient navigation (UI/UX section 3). JS tabs are used instead of native tabs so labels and
- * targets can be larger than the system tab bar allows. Assistant joins this bar when the AI phase lands.
+ * targets can be larger than the system tab bar allows.
  */
 const tab = (title: string, icon: IconName) => ({
   title,
@@ -29,6 +29,7 @@ export default function PatientTabs() {
       }}
     >
       <Tabs.Screen name="home" options={{ ...tab('Home', 'home'), headerShown: false }} />
+      <Tabs.Screen name="assistant" options={tab('Ask me', 'speaker')} />
       <Tabs.Screen name="schedule" options={tab('My day', 'schedule')} />
       <Tabs.Screen name="reminders" options={tab('Reminders', 'reminders')} />
       <Tabs.Screen name="more" options={tab('More', 'more')} />

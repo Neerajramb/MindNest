@@ -14,7 +14,7 @@ declaration in the project report can be accurate.
 | Component | Provider | Data sent | Notes |
 |---|---|---|---|
 | Face detection and recognition | OpenCV YuNet + SFace, run locally | None leaves the server | Biometric data is never sent to third parties |
-| Text embeddings | fastembed all-MiniLM-L6-v2, run locally | None leaves the server | |
+| Text embeddings | fastembed all-MiniLM-L6-v2, run locally | None leaves the server | Memory search is local; only the top excerpts reach the LLM |
 | Assistant responses (memory and general questions) | Google Gemini API (free tier) | Question plus top retrieved memory excerpts | Free tier: Google may train on and human-review inputs. Synthetic demo data only. |
 | Room-scan object detection | Google Gemini API (free tier) | Room-scan images | Staged test scenes only |
 | Speech-to-text | Google Gemini API (free tier) | Short audio clips | Synthetic demo conversations only |

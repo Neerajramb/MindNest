@@ -15,6 +15,8 @@ api_v1: list[URLPattern | URLResolver] = [
     path("", include("safety.urls")),
     path("", include("people.urls")),
     path("", include("objects_ai.urls")),
+    path("", include("memory.urls")),
+    path("", include("assistant.urls")),
 ]
 
 urlpatterns = [

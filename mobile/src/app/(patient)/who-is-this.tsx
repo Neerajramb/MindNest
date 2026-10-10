@@ -1,5 +1,6 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Speech from 'expo-speech';
+import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Linking, View } from 'react-native';
 
@@ -23,6 +24,7 @@ type Result = {
 
 /** P-04 "Who is this?": identity is shown only above the threshold; otherwise "I'm not sure" (BR-04). */
 export default function WhoIsThis() {
+  const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef<CameraView>(null);
   const [facing, setFacing] = useState<'back' | 'front'>('back');
@@ -87,6 +89,19 @@ export default function WhoIsThis() {
               <AppText variant="title">{known && result.person ? result.person.name : 'Not sure'}</AppText>
               {known && result.person?.relationship ? <AppText variant="bodyStrong">{result.person.relationship}</AppText> : null}
               <AppText>{result.message}</AppText>
+              {known && result.person ? (
+                <Button
+                  label={`Ask about ${result.person.name}`}
+                  tone="secondary"
+                  icon="speaker"
+                  onPress={() =>
+                    router.push({
+                      pathname: '/assistant',
+                      params: { personId: result.person!.id, personName: result.person!.name },
+                    })
+                  }
+                />
+              ) : null}
               {known && result.confidence === 'medium' ? (
                 <AppText variant="caption" color={colors.textMuted}>
                   Fairly sure. Ask them if you are unsure.

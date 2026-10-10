@@ -58,6 +58,7 @@ export default function PatientLayout() {
         <Stack.Screen name="who-is-this" options={{ title: 'Who is this?' }} />
         <Stack.Screen name="find" options={{ title: 'Find my things' }} />
         <Stack.Screen name="scan" options={{ title: 'Scan a room' }} />
+        <Stack.Screen name="memory" options={{ title: 'My memories' }} />
       </Stack>
     </TextScaleProvider>
   );

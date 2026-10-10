@@ -63,6 +63,12 @@
           "photosPermission": "MindNest lets caregivers choose photos of family members so they can be recognised.",
           "cameraPermission": "MindNest uses the camera to add photos of family members."
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "MindNest uses the microphone to hear your questions and, when everyone agrees, to save conversations."
+        }
       ]
     ],
     "experiments": {

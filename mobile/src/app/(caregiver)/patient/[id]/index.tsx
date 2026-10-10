@@ -56,6 +56,7 @@ export default function PatientOverview() {
     { href: { pathname: '/patient/[id]/safety', params: { id } }, icon: 'safety', title: 'Location & safe zones', detail: 'Map, zones and alerts' },
     { href: { pathname: '/patient/[id]/people', params: { id } }, icon: 'people', title: 'Familiar people', detail: 'Faces for “Who is this?”' },
     { href: { pathname: '/patient/[id]/objects', params: { id } }, icon: 'more', title: 'Belongings & rooms', detail: 'Last seen places' },
+    { href: { pathname: '/patient/[id]/memories', params: { id } }, icon: 'speaker', title: 'Conversations', detail: 'What the patient chooses to share' },
     { href: { pathname: '/patient/[id]/contacts', params: { id } }, icon: 'phone', title: 'Emergency contacts', detail: 'Shown on their Help screen' },
     { href: { pathname: '/patient/[id]/activity', params: { id } }, icon: 'activity', title: 'Activity', detail: 'What happened recently' },
   ];

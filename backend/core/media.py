@@ -44,3 +44,18 @@ def to_jpeg_bytes(rgb: np.ndarray, quality: int = 85) -> bytes:
     buffer = io.BytesIO()
     Image.fromarray(rgb).save(buffer, format="JPEG", quality=quality)
     return buffer.getvalue()
+
+
+AUDIO_EXTENSIONS = {"m4a", "mp4", "aac", "wav", "mp3", "ogg", "flac", "caf"}
+
+
+def read_audio(upload: UploadedFile | None, field: str = "audio") -> tuple[bytes, str]:
+    """Return the recording's bytes and extension after size/type checks. Nothing is written to disk."""
+    if upload is None:
+        raise ValidationError({field: "Attach a recording."})
+    extension = (upload.name or "").rsplit(".", 1)[-1].lower()
+    if extension not in AUDIO_EXTENSIONS:
+        raise ValidationError({field: "Unsupported recording format."})
+    if upload.size is None or upload.size == 0 or upload.size > settings.MAX_AUDIO_UPLOAD_BYTES:
+        raise ValidationError({field: "The recording is empty or too long."})
+    return upload.read(), extension

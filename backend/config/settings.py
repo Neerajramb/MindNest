@@ -63,6 +63,8 @@ LOCAL_APPS = [
     "safety",
     "people",
     "objects_ai",
+    "memory",
+    "assistant",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
