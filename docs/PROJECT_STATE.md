@@ -1,29 +1,29 @@
 # Project State (resume here)
 
-Last updated: 2026-10-10, end of P5a.
+Last updated: 2026-10-10, end of P4 (Day 2).
 
 ## Where things are
 
 - Plan: 3-day MVP covering demo scenarios A–F (see `docs/adr/` and `docs/analysis/consistency-matrix.md`).
-- Phases done: **P1**, **P2 Auth/RBAC/data model**, **P3 Schedule/medication/reminders/alerts**, **P5a Safety backend**.
-- Next phase: **P4 Mobile shell + core screens (Day 2)**.
+- Phases done: **P1**, **P2 Auth/RBAC/data model**, **P3 Schedule/medication/reminders/alerts**, **P5a Safety backend**, **P4 Mobile app core**.
+- Next phase: **Day 3: P8 Face, P7 Objects, P9/P10 Memory + Assistant, P11 Well-being, P12 QA, P13 Handover**.
 
 ## Next exact task
 
-Mobile P4 (Expo SDK 57, Expo Go on iPhone): API client with JWT refresh (expo-secure-store), auth screens
-(login with role toggle, caregiver register, patient register with link code), role-based route groups
-`(patient)` and `(caregiver)`, design tokens (>=18pt, >=56dp targets), patient Home/Schedule/Reminders/Medication/
-Safety/Settings/Help, caregiver Dashboard/Patient overview/Schedule+Medication management/Reminders/Alerts/Geofence.
-Local notifications from `/patients/{id}/reminders`; caregiver alert polling (`/alerts?unacknowledged=true`).
-Read the Expo skills (`~/.claude/plugins/cache/claude-plugins-official/expo/1.13.6/skills/`) and the
-`animate-expo` / `frontend-ui-engineering` skills before building screens.
+P8 Face: backend `people` app (Person, FaceEmbedding with float32 vector), OpenCV YuNet + SFace models
+downloaded to `backend/ai_models/` (git-ignored) by a management command, enrolment endpoint (multipart image,
+consent flag, photo discarded after embedding), `/face/recognize` with a threshold and a 'not sure' answer;
+mobile C-08 People and P-04 'Who is this?' (expo-camera). `GEMINI_API_KEY` is needed from P7 onwards.
 
-## Last gate results (P5a)
+## Last gate results (P4)
 
 | Check | Result |
 |---|---|
-| Backend `pytest` | 92 passed, 92% coverage |
-| Backend `ruff`, `mypy`, `makemigrations --check` | Clean |
+| Backend `pytest` | 92 passed, 92% coverage (unchanged) |
+| Mobile `tsc`, `expo lint` | Clean |
+| Mobile `jest` | 17 passed |
+| `expo export` iOS + Android | Both bundles built |
+| On-device run | Not yet done (KI-10) |
 
 Run locally: `python manage.py runserver 0.0.0.0:8000` and `python manage.py run_huey` (two terminals).
 Demo accounts (fictional): `python manage.py seed_demo` → `carol` (caregiver), `thomas` (patient).

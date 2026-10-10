@@ -52,6 +52,19 @@ npm run typecheck
 npm test
 ```
 
+### Run on your phone (Expo Go)
+
+1. Install **Expo Go** from the App Store or Play Store. The phone and computer must be on the same Wi-Fi.
+2. Find the computer's LAN IP (`ipconfig` on Windows, IPv4 Address), for example `192.168.1.20`.
+3. Copy `mobile/.env.example` to `mobile/.env` and set `EXPO_PUBLIC_API_URL=http://<LAN-IP>:8000/api/v1`.
+4. In `backend/.env`, make sure `DJANGO_ALLOWED_HOSTS` includes the LAN IP (or `*` for local development).
+5. Start the backend with `python manage.py runserver 0.0.0.0:8000` and the jobs with `python manage.py run_huey`.
+6. Run `cd mobile && npm start`, then scan the QR code with the iPhone Camera app (or Expo Go on Android).
+7. Demo accounts after `python manage.py seed_demo`: caregiver `carol`, patient `thomas`,
+   password `MindNest-Demo-2026` (fictional data).
+
+The server address can also be changed on the sign-in screen ("Server address") without restarting.
+
 The app reads the backend URL from `EXPO_PUBLIC_API_URL` (for example `http://192.168.1.20:8000/api/v1`).
 Use your computer's LAN IP, not `localhost`, because the phone is a separate device.
 When the phone first connects, Windows may ask to allow Python through the firewall on private networks; allow it.

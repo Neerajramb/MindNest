@@ -11,4 +11,7 @@ Honest register of limitations. Each entry says what is affected, why, and what 
 | KI-05 | Geofencing | No background location tracking | Needs a development build and background permission | expo-location background task in a dev build | High |
 | KI-06 | Tooling | Expo skills plugin fails to load on Claude Code 2.1.86 | Unknown hook event `UserPromptExpansion` | Update Claude Code; skills read directly meanwhile | Low |
 | KI-07 | Auth | No email password reset | No SMTP provider configured | Add an email backend and reset tokens | Medium |
+| KI-09 | Privacy | Offline cache (the patient's agenda, reminders, medicines, safety status) is stored in AsyncStorage, which is not encrypted | Needed for offline viewing (UI/UX section 16) | Limited to the patient's own read data, 24 h maximum age, wiped on sign-out; move to an encrypted store for production | Medium |
+| KI-10 | Verification | Mobile UI not yet exercised on a physical phone | Verified by tsc, ESLint, Jest and a full iOS/Android bundle export only | Run the demo scenarios on the iPhone (Expo Go) and Android; check native date/time pickers, maps and notifications | High |
+| KI-11 | UX scope | Reminder detail (P-09) is merged into reminder cards; Assistant, Memory, Well-being, Find object and Who is this arrive in the AI phase | 3-day plan order | Delivered on Day 3 | Low |
 | KI-08 | Deployment | VM / container deployment not verified | Docker not installed | Verify on a VM before production use | Medium |

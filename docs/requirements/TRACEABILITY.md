@@ -11,10 +11,10 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 |---|---|---|---|---|---|
 | FR-001 | Authenticate patients and caregivers | AUTH-01, AUTH-03 | accounts | TC-001, TC-002 | Tested (API) |
 | FR-002 | Separate patient/caregiver privileges | AUTH-02, AUTH-04, BR-01 | accounts, care, core.scope | TC-003, TC-016 | Tested (API) |
-| FR-003 | Patient views daily schedule | SCH-02 | scheduling | AC-02 | Tested (API) |
-| FR-004 | Caregiver CRUD schedule items | SCH-01, SCH-03 | scheduling | AC-02 | Tested (API) |
-| FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Tested (API) |
-| FR-006 | Caregiver medication records and schedules | MED-01, MED-02, MED-05 | scheduling | TC-004 | Tested (API) |
+| FR-003 | Patient views daily schedule | SCH-02 | scheduling | AC-02 | Implemented end-to-end (API tested; UI not yet run on device) |
+| FR-004 | Caregiver CRUD schedule items | SCH-01, SCH-03 | scheduling | AC-02 | Implemented end-to-end (API tested; UI not yet run on device) |
+| FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Implemented end-to-end (API tested; UI not yet run on device) |
+| FR-006 | Caregiver medication records and schedules | MED-01, MED-02, MED-05 | scheduling | TC-004 | Implemented end-to-end (API tested; UI not yet run on device) |
 | FR-007 | Patient asks assistant about schedule/reminders/info | RAG-01, RAG-06 | assistant | AC-08 | Not started |
 | FR-008 | Capture camera input for object/face | OBJ-01, FACE-01 | mobile, objects_ai, people | TC-006, TC-008 | Not started |
 | FR-009 | Detect configured everyday objects | OBJ-02, OBJ-03 | objects_ai | TC-006 | Not started |
@@ -28,21 +28,21 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | FR-017 | RAG retrieves relevant memories | RAG-03, RAG-04 | memory | TC-011, AC-06 | Not started |
 | FR-018 | Person-aware retrieval | RAG-05 | memory, assistant | TC-012, AC-07 | Not started |
 | FR-019 | Grounded responses | RAG-06, RAG-07, BR-05, BR-06 | assistant | TC-013, AC-08 | Not started |
-| FR-020 | Caregiver defines safe zones | SAFE-01, CARE-04 | safety | — | Tested (API) |
-| FR-021 | Monitor location vs geofence | SAFE-02, SAFE-03, BR-07 | safety | TC-014 | Tested (API) |
-| FR-022 | Caregiver alert on violation | SAFE-04, SAFE-05 | safety, notifications | TC-015, AC-09 | Tested (API) |
+| FR-020 | Caregiver defines safe zones | SAFE-01, CARE-04 | safety | — | Implemented end-to-end (API tested; UI not yet run on device) |
+| FR-021 | Monitor location vs geofence | SAFE-02, SAFE-03, BR-07 | safety | TC-014 | Implemented end-to-end (API tested; UI not yet run on device) |
+| FR-022 | Caregiver alert on violation | SAFE-04, SAFE-05 | safety, notifications | TC-015, AC-09 | Implemented end-to-end (API tested; UI not yet run on device) |
 | FR-023 | Well-being audio | WELL-01..03 | wellbeing | — | Not started |
-| FR-024 | Activity/event logs | CARE-06 | audit | — | Not started |
-| FR-025 | Caregiver notifications for important events | CARE-03 | notifications | — | API done |
+| FR-024 | Activity/event logs | CARE-06 | audit | — | Implemented (UI not yet run on device) |
+| FR-025 | Caregiver notifications for important events | CARE-03 | notifications | — | Implemented (UI not yet run on device) |
 
 ## Caregiver dashboard (SRS 4.10)
 
 | ID | Requirement | Screens | Status |
 |---|---|---|---|
-| CARE-01 | View patient status | C-02, C-03 | Not started |
-| CARE-02 | View schedule and reminder info | C-03, C-07 | API done |
+| CARE-01 | View patient status | C-02, C-03 | Implemented (UI not yet run on device) |
+| CARE-02 | View schedule and reminder info | C-03, C-07 | Implemented (UI not yet run on device) |
 | CARE-03 | Receive configured alerts | C-11 | Not started |
-| CARE-04 | Manage geofences | C-10 | API done |
+| CARE-04 | Manage geofences | C-10 | Implemented (UI not yet run on device) |
 | CARE-05 | Manage familiar people | C-08 | Not started |
 | CARE-06 | Review activity history | Activity log | Not started |
 
@@ -52,7 +52,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 |---|---|---|---|
 | NFR-001 | Privacy (minimise sensitive data) | No raw media retained; retention purge tests; Gemini synthetic-data rule | Not started |
 | NFR-002 | Security | IDOR matrix, auth tests, throttling, /security-review | In progress |
-| NFR-003 | Usability | Accessible tokens, large targets, icon + text, screen reader labels | Not started |
+| NFR-003 | Usability | Accessible tokens, large targets, icon + text, screen reader labels | Implemented (19pt+ text, 56dp+ targets, icon+text, text-size setting) |
 | NFR-004 | Performance | Latency measured and recorded in P12 | Not started |
 | NFR-005 | Reliability | TC-017 (LLM down → structured features keep working) | Not started |
 | NFR-006 | Maintainability | Module boundaries, provider interfaces, CI | In progress |
