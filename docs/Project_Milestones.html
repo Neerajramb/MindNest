@@ -1,0 +1,148 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
+</head><body>
+<h1>Milestones for AI-Powered Multimodal Assistive Application for People with MCI</h1>
+<p>Project: MCI Assistive Application (Django backend, mobile Patient app, Caregiver dashboard)</p>
+<p>The project is divided into Milestone 0 and 11 Core Milestones, following the Recommended Development Order and Module Design in the Consolidated Project Specification.
+Milestones 1–4 can be completed in roughly any order once Milestone 0 is done; Milestones 5–11 depend on the data models and auth from Milestones 1–4.
+Each milestone includes a Git commit message. When completed, use a unique commit message and push your updates to GitHub.</p>
+<hr>
+<h2>Milestone 0: GitHub Repository Setup (Mandatory)</h2>
+<ul>
+<li>Create a private GitHub repository.</li>
+<li>Add README.md with a short project description (problem, objectives, actors).</li>
+<li>Add .gitignore for Python, Django, React/Vue/mobile build artifacts, and vector-store cache files.</li>
+<li>Commit and push initial setup to the repository.</li>
+<li>Add your guide/reviewer as a collaborator so progress can be tracked.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> Milestone-0 MCI-Assist Setup</p>
+<hr>
+<h2>Milestone 1: Backend Project Setup, Authentication &amp; RBAC (MOD-01)</h2>
+<ul>
+<li>Set up the Django project and REST API skeleton.</li>
+<li>Implement login/session or token-based authentication.</li>
+<li>Define roles: Patient, Caregiver, (Admin if applicable).</li>
+<li>Implement role-based access control on all protected endpoints.</li>
+<li>Link patient accounts to caregiver accounts (registration/invite flow).</li>
+<li>Redirect users to role-specific interfaces (Patient app vs Caregiver dashboard) after login.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 2: Patient &amp; Caregiver Data Models (MOD-02, Database Design)</h2>
+<ul>
+<li>Create models for: User, Patient profile, Caregiver profile, Patient–Caregiver relationship.</li>
+<li>Create models for: Schedule/Calendar items, Medication, Reminder.</li>
+<li>Create models for: Registered People (face metadata), Object observations, Conversation/memory records, Safe zones/Geofences, Activity/Audit log.</li>
+<li>Define relationships (1:n, n:n where required — e.g., Caregiver–Patient, Patient–Medication, Patient–RegisteredPerson).</li>
+<li>Add migrations and seed/test data.</li>
+<li>Ensure authorization filters (a caregiver only sees their linked patients' data) are enforced at the model/query layer.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 3: Schedule, Medication &amp; Reminders (MOD-03, MOD-04)</h2>
+<ul>
+<li>CRUD APIs for daily schedule items, recurring routines and appointments.</li>
+<li>CRUD APIs for medication entries (name, dosage, instructions, timing).</li>
+<li>Reminder generation logic tied to schedule/medication timing.</li>
+<li>Reminder acknowledgment/status tracking (acknowledged / missed / snoozed) — no AI-driven dosage changes, and no claim of verified ingestion.</li>
+<li>Ensure caregiver-side edits to schedule/medication require confirmation before saving.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 4: Patient App UI &amp; Caregiver Dashboard UI (Core Screens)</h2>
+<ul>
+<li>Build Patient app screens: Home, Schedule/Calendar, Reminders, Medication, Settings, Help/Emergency.</li>
+<li>Build Caregiver dashboard screens: Dashboard/overview, Patient overview, Schedule &amp; medication management.</li>
+<li>Wire every screen action to its corresponding API endpoint.</li>
+<li>Add loading, empty, error and offline states to every major screen.</li>
+<li>Keep patient and caregiver navigation fully separated.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 5: Object Intelligence — Detection, Tracking &amp; Observation Storage (MOD-05)</h2>
+<ul>
+<li>Integrate camera capture on the Patient app (frame extraction).</li>
+<li>Implement object detection/tracking pipeline (OpenCV or chosen CV stack).</li>
+<li>Store observations: object_id, timestamp, location/context, confidence, source.</li>
+<li>Implement &quot;last observed location&quot; retrieval API and patient-facing query flow.</li>
+<li>Ensure the response never claims a guaranteed current location — only last observed.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 6: Face Intelligence — Recognition &amp; Familiar-Person Management (MOD-06)</h2>
+<ul>
+<li>Implement face detection and embedding generation from camera input.</li>
+<li>Implement registered-person matching against caregiver-registered faces.</li>
+<li>Build caregiver-side &quot;Register Person&quot; flow (name, relationship, face capture/upload).</li>
+<li>Build patient-facing &quot;Who is this?&quot; flow, including a clear &quot;not sure&quot; response below the confidence threshold.</li>
+<li>Ensure low-confidence matches are never force-mapped to a registered identity.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 7: Conversational Memory — Vector Store &amp; RAG Ingestion/Retrieval (MOD-07)</h2>
+<ul>
+<li>Set up vector store alongside the relational database.</li>
+<li>Implement speech-to-text (or text) ingestion of conversations.</li>
+<li>Implement cleaning/segmentation and context extraction (person/topic/time).</li>
+<li>Generate embeddings and store them with metadata (person, time, topic).</li>
+<li>Implement vector search with metadata filtering/reranking for memory retrieval.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 8: AI Assistant Orchestration (MOD-08)</h2>
+<ul>
+<li>Implement intent/context routing (structured-data query vs conversational-memory query).</li>
+<li>Implement hybrid retrieval: deterministic lookups for schedule/medication-type questions, semantic retrieval for memory-type questions.</li>
+<li>Integrate the LLM/RAG layer for response generation, with person-aware context enrichment where relevant.</li>
+<li>Build the Patient app Assistant screen (chat/voice interface, quick prompts).</li>
+<li>Ensure the assistant explicitly states uncertainty rather than fabricating an answer.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 9: Geofencing &amp; Safety Alerts (MOD-09)</h2>
+<ul>
+<li>Implement caregiver-defined safe zones (center + radius).</li>
+<li>Implement location update ingestion from the mobile device.</li>
+<li>Implement boundary evaluation (inside/outside safe zone) and alert triggering.</li>
+<li>Build the Patient app safety-status view and Caregiver map/geofence management screen.</li>
+<li>Build caregiver alert acknowledgment flow.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 10: Notifications, Well-being &amp; Voice/TTS (MOD-10, MOD-11)</h2>
+<ul>
+<li>Implement the notification service for patient reminders and caregiver alerts.</li>
+<li>Implement text-to-speech output for patient-facing responses.</li>
+<li>Build the Well-being module: guided meditation/relaxation audio playback screen.</li>
+<li>Ensure well-being content is clearly framed as supportive, not clinical treatment.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Milestone 11: Activity/Audit Logging, Integration &amp; Security Testing (MOD-12)</h2>
+<ul>
+<li>Implement activity/audit logging for key patient and caregiver events.</li>
+<li>Build the caregiver-facing activity log view.</li>
+<li>Run integration tests mapped to requirement IDs across all modules.</li>
+<li>Test authentication/authorization on every protected endpoint.</li>
+<li>Run security review and performance benchmarking on AI-service endpoints.</li>
+<li>Verify the full Project Completion Checklist from the specification (Section 15.6) against the built system.</li>
+</ul>
+<p><strong>Git Commit Message:</strong> USE UNIQUE COMMIT MESSAGE ACCORDING TO MILESTONE</p>
+<hr>
+<h2>Final Submission</h2>
+<ul>
+<li>Submit code (ZIP or repository link) with a project report.</li>
+<li>Submit a demo video covering the Patient app and Caregiver dashboard flows.</li>
+<li>Include the video link in the report.</li>
+<li>Include a declaration of AI usage in the report (mandatory whether or not AI was used).</li>
+</ul>
+<p><strong>Git Commit Message:</strong> Milestone-MCI-Assist Final-Submission</p>
+<hr>
+<h3>Tracking Progress</h3>
+<ul>
+<li>Use Git commits for each milestone with a unique commit message.</li>
+<li>Test functionality after completing each milestone.</li>
+<li>Log issues encountered and their resolutions in README.md or GitHub Issues.</li>
+<li>Milestones 1–4 can be done in any order; Milestones 5–11 build on the models and auth from Milestones 1–4.</li>
+</ul>
+
+</body></html>

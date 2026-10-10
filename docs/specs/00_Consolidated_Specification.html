@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCI Assistive App — Consolidated Specification</title>
+<style>
+:root{--ink:#1c1e21;--muted:#5c6370;--line:#e2e5e9;--accent:#2f6fed;--bgnav:#fafbfc}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);line-height:1.65;background:#fff}
+.layout{display:flex;max-width:1200px;margin:0 auto}
+nav{width:270px;flex-shrink:0;border-right:1px solid var(--line);background:var(--bgnav);height:100vh;position:sticky;top:0;overflow-y:auto;padding:22px 16px}
+nav h4{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 10px}
+nav ul{list-style:none;padding:0;margin:0}
+nav li{margin:2px 0}
+nav a{color:var(--ink);text-decoration:none;font-size:13px;display:block;padding:5px 8px;border-radius:4px}
+nav a:hover{background:#eef2ff;color:var(--accent)}
+main{flex:1;min-width:0;padding:40px 48px 100px;max-width:840px}
+h1{font-size:26px;border-bottom:3px solid var(--accent);padding-bottom:10px}
+h2{font-size:20px;margin-top:44px;padding-top:10px;border-top:1px solid var(--line);color:#111}
+h3{font-size:16px;margin-top:26px;color:#222}
+h4{font-size:13.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+p,li{font-size:14.5px}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f4f6f9;font-weight:600}
+tr:nth-child(even) td{background:#fbfcfd}
+code{background:#f1f3f5;padding:1px 5px;border-radius:3px;font-size:.9em}
+blockquote{border-left:3px solid var(--accent);margin:14px 0;padding:2px 16px;color:var(--muted);background:#f7f9ff}
+hr{border:none;border-top:1px solid var(--line);margin:30px 0}
+a{color:var(--accent)}
+.badge{display:inline-block;background:#eef2ff;color:var(--accent);font-size:11px;padding:2px 8px;border-radius:10px;margin-bottom:14px}
+@media print{nav{display:none}main{max-width:none;padding:0}}
+@media (max-width:900px){nav{display:none}main{padding:24px}}
+</style></head>
+<body>
+<div class="layout">
+<nav><h4>Contents</h4><ul><li><a href="#consolidated-project-specification">Consolidated Project Specification</a></li><li><a href="#table-of-contents">Table of Contents</a></li><li><a href="#1-purpose-vision">1. Purpose &amp; Vision</a></li><li><a href="#2-scope">2. Scope</a></li><li><a href="#3-stakeholders-and-actors">3. Stakeholders and Actors</a></li><li><a href="#4-system-architecture">4. System Architecture</a></li><li><a href="#5-functional-requirements">5. Functional Requirements</a></li><li><a href="#6-non-functional-requirements">6. Non-Functional Requirements</a></li><li><a href="#7-business-rules-error-handling">7. Business Rules &amp; Error Handling</a></li><li><a href="#8-database-design-er-model">8. Database Design &amp; ER Model</a></li><li><a href="#9-api-specification">9. API Specification</a></li><li><a href="#10-uiux-design-screen-flow">10. UI/UX Design &amp; Screen Flow</a></li><li><a href="#11-use-cases">11. Use Cases</a></li><li><a href="#12-acceptance-criteria-test-plan">12. Acceptance Criteria &amp; Test Plan</a></li><li><a href="#13-traceability-matrix">13. Traceability Matrix</a></li><li><a href="#14-constraints-assumptions">14. Constraints &amp; Assumptions</a></li><li><a href="#15-development-order-completion-checklists">15. Development Order &amp; Completion Checklists</a></li><li><a href="#16-source-documents">16. Source Documents</a></li></ul></nav>
+<main>
+<span class="badge">Baseline Draft v1.0</span>
+<h1 id="ai-powered-multimodal-assistive-application-for-people-with-mild-cognitive-impairment-mci">AI-Powered Multimodal Assistive Application for People with Mild Cognitive Impairment (MCI)</h1>
+<h2 id="consolidated-project-specification">Consolidated Project Specification</h2>
+<p><strong>Team:</strong> Mridula J B, Navaneeth S Narayan, Neeraj Ram B, Sonal Santhosh
+<strong>Guide:</strong> Prof. Binu Rajan M R, Assistant Professor, Dept. of CSE, SCTCE</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document</td>
+<td>Consolidated Project Specification (merges PRS, SRS, Architecture, Database, API, UI/UX, Use Case &amp; Test docs)</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>1.0 — Baseline Draft</td>
+</tr>
+<tr>
+<td>Prepared for</td>
+<td>SCTCE B.Tech CSE Project</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>Requirements, design and test baseline for implementation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-purpose--vision">Purpose &amp; Vision</a></li>
+<li><a href="#2-scope">Scope</a></li>
+<li><a href="#3-stakeholders-and-actors">Stakeholders and Actors</a></li>
+<li><a href="#4-system-architecture">System Architecture</a></li>
+<li><a href="#5-functional-requirements">Functional Requirements</a></li>
+<li><a href="#6-non-functional-requirements">Non-Functional Requirements</a></li>
+<li><a href="#7-business-rules--error-handling">Business Rules &amp; Error Handling</a></li>
+<li><a href="#8-database-design--er-model">Database Design &amp; ER Model</a></li>
+<li><a href="#9-api-specification">API Specification</a></li>
+<li><a href="#10-uiux-design--screen-flow">UI/UX Design &amp; Screen Flow</a></li>
+<li><a href="#11-use-cases">Use Cases</a></li>
+<li><a href="#12-acceptance-criteria--test-plan">Acceptance Criteria &amp; Test Plan</a></li>
+<li><a href="#13-traceability-matrix">Traceability Matrix</a></li>
+<li><a href="#14-constraints--assumptions">Constraints &amp; Assumptions</a></li>
+<li><a href="#15-development-order--completion-checklists">Development Order &amp; Completion Checklists</a></li>
+<li><a href="#16-source-documents">Source Documents</a></li>
+</ol>
+<hr />
+<h2 id="1-purpose-vision">1. Purpose &amp; Vision</h2>
+<p>This document consolidates the Project Requirements Specification, Software Requirements Specification, System Design &amp; Architecture, Database Design, API Specification, UI/UX Design, and Use Case/Test Specification into a single reference. It establishes the agreed functional scope, actors, architecture, data model, API surface, screen flows, and verification plan for the proposed multimodal assistive application, frozen before detailed implementation.</p>
+<p><strong>Vision:</strong> A unified assistive platform supporting people with Mild Cognitive Impairment through memory assistance, routine management, familiar-person recognition, object-location assistance, contextual conversation retrieval, safety monitoring, and caregiver support — reducing dependence on multiple disconnected apps via a privacy-preserving multimodal companion. Smartphone capture (audio, video, GPS) is paired with heavier AI processing on a secondary/local node.</p>
+<p><strong>Product perspective:</strong> A multimodal assistive application rather than a standalone chatbot — it accepts camera, audio and location input, routes it through specialized modules, stores relevant structured/unstructured data, and returns context-aware assistance.</p>
+<hr />
+<h2 id="2-scope">2. Scope</h2>
+<h3 id="21-in-scope">2.1 In Scope</h3>
+<ul>
+<li>Patient mobile application with a simple, accessible interface</li>
+<li>Caregiver interface/dashboard for patient management and monitoring</li>
+<li>Object detection, tracking and last-observed object-location retrieval</li>
+<li>Facial detection and recognition of registered/familiar individuals</li>
+<li>Contextual conversational memory via STT, embeddings, retrieval and an LLM/RAG layer</li>
+<li>Personal AI assistant accessing structured application data and retrieved memories</li>
+<li>Daily schedule, calendar/appointments and reminder management</li>
+<li>Medication schedule and medication reminders</li>
+<li>GPS-based geofencing and caregiver alerts</li>
+<li>Relaxation, meditation and therapeutic/well-being audio features</li>
+<li>Notifications and activity/event logging</li>
+<li>Privacy, authentication, authorization and controlled access to sensitive data</li>
+</ul>
+<h3 id="22-out-of-scope-for-the-baseline">2.2 Out of Scope for the Baseline</h3>
+<ul>
+<li>Medical diagnosis or clinical decision-making</li>
+<li>Automatic prescription, dosage modification or medication changes by AI</li>
+<li>Claiming physical ingestion of medication unless an actual verification mechanism is implemented</li>
+<li>Guaranteed current physical location of an object — the system reports a last detected/observed location</li>
+<li>Identity claims for unregistered people when recognition confidence is insufficient</li>
+<li>Predictive health analytics, smart-home/IoT/wearables integration and secure cloud sync as mandatory baseline features (future scope)</li>
+</ul>
+<hr />
+<h2 id="3-stakeholders-and-actors">3. Stakeholders and Actors</h2>
+<table>
+<thead>
+<tr>
+<th>Actor</th>
+<th>Role</th>
+<th>Primary Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Patient</td>
+<td>Primary end user</td>
+<td>Simple assistance, reminders, memory cues, object finding, familiar-person recognition, schedule and conversational support</td>
+</tr>
+<tr>
+<td>Caregiver</td>
+<td>Remote support and configuration</td>
+<td>Patient status, schedules, medications, safe zones, alerts, familiar-person registration, activity information</td>
+</tr>
+<tr>
+<td>AI/Backend System</td>
+<td>Processing layer</td>
+<td>Receive multimodal input, run AI services, retrieve data, generate responses, trigger actions</td>
+</tr>
+<tr>
+<td>Notification Service</td>
+<td>Delivery mechanism</td>
+<td>Deliver reminders, alerts and emergency notifications</td>
+</tr>
+</tbody>
+</table>
+<h3 id="31-user-characteristics">3.1 User Characteristics</h3>
+<ul>
+<li><strong>Patient</strong> — needs simple, low-cognitive-load interaction, clear feedback, optional voice assistance and minimal navigation.</li>
+<li><strong>Caregiver</strong> — needs detailed configuration, monitoring, notifications and management controls.</li>
+</ul>
+<h3 id="32-operating-environment">3.2 Operating Environment</h3>
+<ul>
+<li>Android/iOS smartphone or supported mobile device for patient-side capture and interaction</li>
+<li>Backend server/local processing node for APIs and AI services</li>
+<li>Camera and microphone for multimodal capture</li>
+<li>Location services/GPS for geofencing</li>
+<li>Database and vector storage for structured records and memory retrieval</li>
+</ul>
+<hr />
+<h2 id="4-system-architecture">4. System Architecture</h2>
+<h3 id="41-architecture-goals">4.1 Architecture Goals</h3>
+<ul>
+<li>Keep patient interaction simple while hiding technical complexity</li>
+<li>Separate AI modules so they can be developed and tested independently</li>
+<li>Keep sensitive processing/storage under controlled infrastructure where feasible</li>
+<li>Use structured databases for deterministic information and vector retrieval for unstructured memory</li>
+<li>Allow the system to continue core schedule/reminder functions even when a non-critical AI service fails</li>
+</ul>
+<h3 id="42-high-level-architecture-logical-layers">4.2 High-Level Architecture (Logical Layers)</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Components</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Presentation</td>
+<td>Patient Mobile App; Caregiver Dashboard</td>
+<td>User interaction, camera/microphone/location permissions, visual/voice output</td>
+</tr>
+<tr>
+<td>API/Application</td>
+<td>Django/REST backend; Authentication; RBAC; Decision/Orchestration</td>
+<td>Business rules, API endpoints, access control, coordination</td>
+</tr>
+<tr>
+<td>AI Services</td>
+<td>Object Detection/Tracking; Face Recognition; STT; Embeddings; RAG; LLM; optional emotion analysis</td>
+<td>Specialized inference and contextual assistance</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Relational DB; Vector Store; Object/Face metadata; Logs</td>
+<td>Persistent structured data, searchable memories and audit information</td>
+</tr>
+<tr>
+<td>Notification</td>
+<td>Local/Push notification service</td>
+<td>Reminders and caregiver alerts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-logical-data-flow">4.3 Logical Data Flow</h3>
+<p>The mobile application captures multimodal data and sends it to a Django backend. The backend routes data to OpenCV/computer-vision, NLP/RAG and face-recognition components, then combines results through a decision engine before delivering patient assistance or caregiver dashboard information.</p>
+<ol>
+<li>Patient action/input → Mobile app</li>
+<li>Mobile app → authenticated backend API</li>
+<li>Backend → appropriate AI/business service</li>
+<li>AI service → structured result or retrieval context</li>
+<li>Decision/orchestration layer → final action</li>
+<li>Patient receives assistance; caregiver receives monitoring/alert output where applicable</li>
+</ol>
+<h3 id="44-module-design">4.4 Module Design</h3>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MOD-01 Authentication &amp; RBAC</td>
+<td>Login, sessions/tokens, roles, permissions</td>
+</tr>
+<tr>
+<td>MOD-02 Patient/Caregiver Management</td>
+<td>Profiles, relationships and access linkage</td>
+</tr>
+<tr>
+<td>MOD-03 Schedule &amp; Calendar</td>
+<td>Daily routines, appointments, recurring activities</td>
+</tr>
+<tr>
+<td>MOD-04 Reminder &amp; Medication</td>
+<td>Reminder generation, medication schedules and status</td>
+</tr>
+<tr>
+<td>MOD-05 Object Intelligence</td>
+<td>Detection, tracking, scene/context analysis, observation storage</td>
+</tr>
+<tr>
+<td>MOD-06 Face Intelligence</td>
+<td>Face detection, embedding, matching and identity context</td>
+</tr>
+<tr>
+<td>MOD-07 Conversational Memory</td>
+<td>STT, cleaning/segmentation, embedding, vector retrieval</td>
+</tr>
+<tr>
+<td>MOD-08 AI Assistant</td>
+<td>Intent/context routing, structured-data lookup, RAG, response generation</td>
+</tr>
+<tr>
+<td>MOD-09 Safety &amp; Geofencing</td>
+<td>Location monitoring, safe-zone evaluation and alerts</td>
+</tr>
+<tr>
+<td>MOD-10 Notifications</td>
+<td>Patient reminders and caregiver alerts</td>
+</tr>
+<tr>
+<td>MOD-11 Well-being</td>
+<td>Meditation/relaxation content and playback</td>
+</tr>
+<tr>
+<td>MOD-12 Activity/Audit Logging</td>
+<td>Important user/system events and monitoring history</td>
+</tr>
+</tbody>
+</table>
+<h3 id="45-object-intelligence-pipeline">4.5 Object Intelligence Pipeline</h3>
+<p>Camera input → frame extraction → object detection → object tracking → scene/context understanding → object observation storage → patient query → last-observation retrieval → text/voice response.</p>
+<p><strong>Stored observation fields:</strong> <code>object_id</code> (category/instance), <code>timestamp</code>, <code>location/context</code> (room/scene label), <code>confidence</code> (detection score), <code>source</code> (camera/session).</p>
+<h3 id="46-face-recognition-pipeline">4.6 Face Recognition Pipeline</h3>
+<p>Camera input → face detection → face embedding → registered-person matching → identity/relationship cue → optional RAG context enrichment.</p>
+<p>The system must distinguish recognition from identification confidence — unknown/low-confidence faces are never force-mapped to a registered person.</p>
+<h3 id="47-conversational-rag-pipeline">4.7 Conversational RAG Pipeline</h3>
+<p>Microphone/text input → speech-to-text (if required) → conversation cleaning/segmentation → context extraction (person/topic/time) → embedding generation → vector search → metadata filtering/reranking → prompt/context construction → LLM response generation → text/voice response.</p>
+<p><strong>Hybrid retrieval strategy:</strong> deterministic retrieval for structured data, semantic retrieval for memory. E.g. <em>"What medicine do I take at 8 AM?"</em> queries the medication/schedule tables; <em>"What did my daughter tell me last Sunday?"</em> uses conversational memory retrieval, optionally filtered by recognized person and time context.</p>
+<h3 id="48-geofencing-pipeline">4.8 Geofencing Pipeline</h3>
+<ol>
+<li>Caregiver defines a named safe zone with center and radius</li>
+<li>Location updates received from the mobile device when permission/service is available</li>
+<li>Backend or device-side safety service evaluates the point against the configured boundary</li>
+<li>On violation, an alert record is created</li>
+<li>Notification service delivers the alert to the caregiver</li>
+<li>System logs the event</li>
+</ol>
+<h3 id="49-failure-isolation">4.9 Failure Isolation</h3>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Core System Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Object AI down</td>
+<td>Schedules, reminders and caregiver management continue</td>
+</tr>
+<tr>
+<td>Face AI down</td>
+<td>Identity cue unavailable; other assistant functions continue</td>
+</tr>
+<tr>
+<td>RAG/LLM down</td>
+<td>Structured schedule/medication queries continue; assistant reports limited capability</td>
+</tr>
+<tr>
+<td>GPS unavailable</td>
+<td>Geofence status becomes unavailable/limited; system records condition</td>
+</tr>
+<tr>
+<td>Notification provider down</td>
+<td>Pending notification is persisted/retried where supported</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-functional-requirements">5. Functional Requirements</h2>
+<h3 id="51-requirement-baseline-from-prs">5.1 Requirement Baseline (from PRS)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-001</td>
+<td>Authenticate patients and caregivers before access to protected functionality</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-002</td>
+<td>Maintain separate patient and caregiver access privileges</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-003</td>
+<td>Patient can view a daily schedule</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-004</td>
+<td>Caregiver can create, edit and delete patient schedule items</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-005</td>
+<td>Generate reminders for configured activities, appointments and medications</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-006</td>
+<td>Caregiver can create medication records and medication schedules</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-007</td>
+<td>Patient can ask the assistant about schedules, reminders and stored information</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-008</td>
+<td>Capture camera input for object and face processing</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-009</td>
+<td>Detect configured everyday objects from supported camera input</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-010</td>
+<td>Store object observations with time and contextual/approximate location</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-011</td>
+<td>Patient can ask where an object was last detected</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-012</td>
+<td>Recognize registered/familiar people using facial features/embeddings</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-013</td>
+<td>Caregiver can register familiar people and relationship information</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-014</td>
+<td>Identify an unknown person as unknown when no reliable match exists</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-015</td>
+<td>Convert supported speech input to text for conversational assistance</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>FR-016</td>
+<td>Store selected conversations/events as searchable memory representations</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-017</td>
+<td>RAG module retrieves relevant memories for a user query</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-018</td>
+<td>Use recognized-person context, where available, to improve memory retrieval</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-019</td>
+<td>Assistant generates responses grounded in available structured data and retrieved memories</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-020</td>
+<td>Caregivers can define geofenced safe zones</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-021</td>
+<td>Monitor patient location for configured geofence rules when location permission/service is available</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-022</td>
+<td>Generate a caregiver alert when a configured geofence violation occurs</td>
+<td>High</td>
+</tr>
+<tr>
+<td>FR-023</td>
+<td>Provide relaxation/meditation/well-being audio content</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>FR-024</td>
+<td>Maintain activity/event logs required for patient and caregiver views</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>FR-025</td>
+<td>Provide caregiver notifications for configured important events</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Each FR has a defined acceptance/verification criterion in the source PRS, e.g. FR-001: valid credentials create an authenticated session and invalid credentials are rejected; FR-009: a supported object is detected with a confidence score above threshold; FR-014: low-confidence matches do not produce a false identity.)</em></p>
+<h3 id="52-detailed-functional-requirements-by-module-from-srs">5.2 Detailed Functional Requirements by Module (from SRS)</h3>
+<p><strong>Authentication &amp; Authorization</strong>
+- AUTH-01: Allow patient/caregiver authentication
+- AUTH-02: Enforce role-based access
+- AUTH-03: Terminate/expire invalid sessions per configured security policy
+- AUTH-04: Caregiver only accesses patients for whom permission exists</p>
+<p><strong>Patient Profile &amp; Familiar People</strong>
+- PEO-01: Caregiver creates a familiar-person profile
+- PEO-02: Profile includes name and relationship
+- PEO-03: System associates supported face-recognition data with the profile
+- PEO-04: Allow profile update/revocation</p>
+<p><strong>Object Memory</strong>
+- OBJ-01: Receive supported camera frames
+- OBJ-02: Detect configured everyday objects
+- OBJ-03: Track object observations across supported frames
+- OBJ-04: Associate an observation with timestamp and approximate scene/location context
+- OBJ-05: Maintain the latest valid observation
+- OBJ-06: Patient can query an object by name or voice
+- OBJ-07: Return the last detected location and timestamp
+- OBJ-08: State/indicate when no recent observation is available</p>
+<p><strong>Facial Recognition</strong>
+- FACE-01: Detect faces from supported camera input
+- FACE-02: Generate a recognition representation for a detected face
+- FACE-03: Compare the representation against registered familiar people
+- FACE-04: Display identity and relationship only when confidence is sufficient
+- FACE-05: Treat insufficient-confidence matches as unknown</p>
+<p><strong>Conversational Memory &amp; RAG</strong>
+- RAG-01: Accept typed or supported voice queries
+- RAG-02: Convert supported voice queries to text
+- RAG-03: Identify relevant context such as person, time and topic where available
+- RAG-04: Retrieve semantically relevant stored memories
+- RAG-05: Use recognized-person context as an optional retrieval filter/weight
+- RAG-06: Generate a response using retrieved memories and structured application data
+- RAG-07: Avoid presenting unavailable information as a known fact</p>
+<p><strong>Schedule, Calendar &amp; Reminders</strong>
+- SCH-01: Caregiver creates recurring or one-time schedule items
+- SCH-02: Patient views the current day's schedule
+- SCH-03: Caregiver creates appointments
+- SCH-04: Generate reminders at configured times
+- SCH-05: Patient marks/confirms supported reminders as completed
+- SCH-06: Caregiver reviews reminder status where implemented</p>
+<p><strong>Medication</strong>
+- MED-01: Caregiver creates a medication record
+- MED-02: Record includes name, dosage/instructions and schedule
+- MED-03: Generate medication reminders
+- MED-04: Record reminder status/confirmation where supported
+- MED-05: AI shall <strong>not</strong> change medication dosage or prescribe medication</p>
+<p><strong>Geofencing &amp; Safety</strong>
+- SAFE-01: Caregiver defines a safe zone
+- SAFE-02: Obtain supported location updates
+- SAFE-03: Determine whether a location is inside/outside an active safe zone
+- SAFE-04: Generate an alert on a configured violation
+- SAFE-05: Alert includes relevant time and location information</p>
+<p><strong>Well-being Support</strong>
+- WELL-01: Patient browses supported relaxation/meditation content
+- WELL-02: Patient starts/stops a session
+- WELL-03: Contextual cues may suggest well-being content, but never presented as medical treatment</p>
+<p><strong>Caregiver Dashboard</strong>
+- CARE-01: View patient status
+- CARE-02: View schedule and reminder information
+- CARE-03: Receive configured alerts
+- CARE-04: Manage geofences
+- CARE-05: Manage familiar-person profiles
+- CARE-06: Review relevant activity history</p>
+<hr />
+<h2 id="6-non-functional-requirements">6. Non-Functional Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+<th>Acceptance / Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-001</td>
+<td>Privacy</td>
+<td>High</td>
+<td>Sensitive audio, video, face, conversation and location data shall be protected and minimized</td>
+</tr>
+<tr>
+<td>NFR-002</td>
+<td>Security</td>
+<td>High</td>
+<td>Authenticated access, role-based authorization and secure transport/storage shall be used</td>
+</tr>
+<tr>
+<td>NFR-003</td>
+<td>Usability</td>
+<td>High</td>
+<td>Patient interface uses simple navigation, clear labels, large touch targets and optional voice interaction</td>
+</tr>
+<tr>
+<td>NFR-004</td>
+<td>Performance</td>
+<td>High</td>
+<td>Normal interactions return within a practical interactive delay; AI latency measured during testing</td>
+</tr>
+<tr>
+<td>NFR-005</td>
+<td>Reliability</td>
+<td>High</td>
+<td>Failure of one non-critical AI module shall not crash the entire application</td>
+</tr>
+<tr>
+<td>NFR-006</td>
+<td>Maintainability</td>
+<td>Medium</td>
+<td>AI modules and backend services shall be modular and independently testable</td>
+</tr>
+<tr>
+<td>NFR-007</td>
+<td>Scalability</td>
+<td>Medium</td>
+<td>Architecture allows additional patients and modules without redesigning the entire system</td>
+</tr>
+<tr>
+<td>NFR-008</td>
+<td>Auditability</td>
+<td>Medium</td>
+<td>Important configuration changes and alerts shall be timestamped and logged</td>
+</tr>
+<tr>
+<td>NFR-009</td>
+<td>Safety</td>
+<td>High</td>
+<td>System clearly distinguishes last-known/last-detected information from guaranteed current state</td>
+</tr>
+</tbody>
+</table>
+<p>Additional detail from the SRS:
+- <strong>Security</strong> — protect authentication credentials, restrict data by role, secure API communication, protect sensitive patient data.
+- <strong>Privacy</strong> — raw audio/video and location data not retained longer than required by the defined feature; sensitive data accessible only to authorized users.
+- <strong>Performance</strong> — AI pipelines benchmarked for latency on target hardware; targets recorded after prototype measurement rather than assumed.
+- <strong>Reliability</strong> — a failure in one AI component should degrade that feature gracefully rather than bring down core scheduling/reminder functions.
+- <strong>Maintainability</strong> — modules have clear service boundaries and interfaces; model implementations replaceable without rewriting unrelated modules.
+- <strong>Safety</strong> — AI-generated information shall be grounded in stored data and communicate uncertainty where relevant.</p>
+<hr />
+<h2 id="7-business-rules-error-handling">7. Business Rules &amp; Error Handling</h2>
+<h3 id="71-business-rules">7.1 Business Rules</h3>
+<ul>
+<li><strong>BR-01:</strong> A patient may have one or more authorized caregivers according to the application's permission model</li>
+<li><strong>BR-02:</strong> A familiar-person profile must exist before the system can reliably identify that person</li>
+<li><strong>BR-03:</strong> An object answer refers to the latest valid observation, not a guaranteed current location</li>
+<li><strong>BR-04:</strong> A low-confidence face match must not be presented as a confirmed identity</li>
+<li><strong>BR-05:</strong> Structured data such as medication schedules should be retrieved directly from the database rather than invented by the LLM</li>
+<li><strong>BR-06:</strong> RAG responses should be grounded in retrieved memories and indicate lack of information when appropriate</li>
+<li><strong>BR-07:</strong> Geofence alerts depend on location service availability and configured rules</li>
+<li><strong>BR-08:</strong> AI assistance is supportive and does not replace clinical judgment or emergency services</li>
+</ul>
+<h3 id="72-error-exception-handling">7.2 Error &amp; Exception Handling</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Expected Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Camera unavailable</td>
+<td>Explain that camera access is unavailable and allow non-camera features to continue</td>
+</tr>
+<tr>
+<td>Microphone unavailable</td>
+<td>Allow typed interaction and display a clear voice-input error</td>
+</tr>
+<tr>
+<td>No object detected</td>
+<td>State that the object could not be located from available observations</td>
+</tr>
+<tr>
+<td>Face confidence too low</td>
+<td>Identify as unknown / ask user to try again; do not guess</td>
+</tr>
+<tr>
+<td>No relevant memory</td>
+<td>State that no relevant stored memory was found</td>
+</tr>
+<tr>
+<td>LLM unavailable</td>
+<td>Fallback to structured responses for schedules/reminders where possible</td>
+</tr>
+<tr>
+<td>GPS unavailable</td>
+<td>Disable/flag geofence monitoring and notify caregiver if configured</td>
+</tr>
+<tr>
+<td>Notification service unavailable</td>
+<td>Persist pending notification state and retry where supported</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-security-privacy-requirements">7.3 Security &amp; Privacy Requirements</h3>
+<ul>
+<li>Use authenticated sessions and role-based authorization</li>
+<li>Protect face embeddings and conversation data as sensitive information</li>
+<li>Use secure transport between mobile and backend</li>
+<li>Store only data required for project functionality</li>
+<li>Provide caregiver access only to authorized patient records</li>
+<li>Record important administrative/security events</li>
+<li>Do not expose internal prompts, embeddings or raw sensitive data unnecessarily</li>
+</ul>
+<h3 id="74-verification-strategy">7.4 Verification Strategy</h3>
+<ul>
+<li><strong>Inspection</strong> — documentation/UI/configuration review</li>
+<li><strong>Functional test</strong> — execute a defined input and compare output</li>
+<li><strong>Integration test</strong> — verify interaction between modules</li>
+<li><strong>Performance test</strong> — measure latency/resource usage</li>
+<li><strong>Security test</strong> — verify authorization and access boundaries</li>
+</ul>
+<hr />
+<h2 id="8-database-design-er-model">8. Database Design &amp; ER Model</h2>
+<h3 id="81-design-principles">8.1 Design Principles</h3>
+<ul>
+<li>Use a relational database for users, patients, schedules, medications, appointments, reminders, alerts and configuration</li>
+<li>Use a vector index/store for conversation/object/person memory embeddings; keep a relational metadata record for every vectorized item</li>
+<li>Use foreign keys to enforce patient ownership and caregiver relationships</li>
+<li>Use timestamps consistently for observations, conversations, reminders, locations and alerts</li>
+<li>Do not store raw biometric media unless required; store controlled recognition representations and metadata</li>
+<li>Treat last-seen object information as an observation record, not a guaranteed current state</li>
+</ul>
+<h3 id="82-table-catalogue">8.2 Table Catalogue</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+<th>PK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>users</td>
+<td>Authentication and common account information</td>
+<td>id</td>
+</tr>
+<tr>
+<td>patients</td>
+<td>Patient-specific profile</td>
+<td>id</td>
+</tr>
+<tr>
+<td>caregivers</td>
+<td>Caregiver-specific profile</td>
+<td>id</td>
+</tr>
+<tr>
+<td>caregiver_patient</td>
+<td>Authorized caregiver-to-patient relationship</td>
+<td>id</td>
+</tr>
+<tr>
+<td>people</td>
+<td>Familiar-person registry</td>
+<td>id</td>
+</tr>
+<tr>
+<td>face_embeddings</td>
+<td>Recognition representations</td>
+<td>id</td>
+</tr>
+<tr>
+<td>objects</td>
+<td>Tracked object definitions</td>
+<td>id</td>
+</tr>
+<tr>
+<td>object_observations</td>
+<td>Object detection/last-seen observations</td>
+<td>id</td>
+</tr>
+<tr>
+<td>conversations</td>
+<td>Conversation/session metadata</td>
+<td>id</td>
+</tr>
+<tr>
+<td>conversation_messages</td>
+<td>Individual messages/transcript segments</td>
+<td>id</td>
+</tr>
+<tr>
+<td>memories</td>
+<td>Vectorized searchable memory metadata</td>
+<td>id</td>
+</tr>
+<tr>
+<td>medications</td>
+<td>Medication master records</td>
+<td>id</td>
+</tr>
+<tr>
+<td>medication_schedules</td>
+<td>Medication timing/recurrence</td>
+<td>id</td>
+</tr>
+<tr>
+<td>appointments</td>
+<td>Calendar appointments</td>
+<td>id</td>
+</tr>
+<tr>
+<td>daily_schedules</td>
+<td>Routine activities</td>
+<td>id</td>
+</tr>
+<tr>
+<td>reminders</td>
+<td>Reminder definitions/events</td>
+<td>id</td>
+</tr>
+<tr>
+<td>geofences</td>
+<td>Configured safe zones</td>
+<td>id</td>
+</tr>
+<tr>
+<td>locations</td>
+<td>Location observations</td>
+<td>id</td>
+</tr>
+<tr>
+<td>alerts</td>
+<td>Caregiver safety/important notifications</td>
+<td>id</td>
+</tr>
+<tr>
+<td>activity_logs</td>
+<td>Auditable system/user events</td>
+<td>id</td>
+</tr>
+<tr>
+<td>assistant_sessions</td>
+<td>AI assistant sessions</td>
+<td>id</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-detailed-schema">8.3 Detailed Schema</h3>
+<p><strong>users</strong> — <code>id</code> PK · <code>name</code> VARCHAR(120) NOT NULL · <code>email</code> VARCHAR(255) UNIQUE · <code>phone</code> VARCHAR(30) NULL · <code>password_hash</code> TEXT NOT NULL · <code>role</code> ENUM (PATIENT/CAREGIVER/ADMIN) NOT NULL · <code>is_active</code> BOOLEAN NOT NULL · <code>created_at</code>, <code>updated_at</code> TIMESTAMP</p>
+<p><strong>patients</strong> — <code>id</code> PK · <code>user_id</code> FK users.id, UNIQUE NOT NULL · <code>date_of_birth</code> DATE NULL · <code>preferred_language</code> VARCHAR(20) NULL · <code>timezone</code> VARCHAR(64) NOT NULL · <code>notes</code> TEXT NULL · <code>created_at</code>, <code>updated_at</code> TIMESTAMP</p>
+<p><strong>caregivers</strong> — <code>id</code> PK · <code>user_id</code> FK users.id, UNIQUE NOT NULL · <code>created_at</code>, <code>updated_at</code> TIMESTAMP</p>
+<p><strong>caregiver_patient</strong> — <code>id</code> PK · <code>caregiver_id</code> FK caregivers.id NOT NULL · <code>patient_id</code> FK patients.id NOT NULL · <code>permission_level</code> VARCHAR(30) NOT NULL · <code>is_active</code> BOOLEAN NOT NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>people</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>name</code> VARCHAR(120) NOT NULL · <code>relationship</code> VARCHAR(80) NULL · <code>notes</code> TEXT NULL · <code>is_active</code> BOOLEAN NOT NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>face_embeddings</strong> — <code>id</code> PK · <code>person_id</code> FK people.id NOT NULL · <code>embedding_ref</code> TEXT NOT NULL (reference to vector storage) · <code>model_name</code> VARCHAR(120) NOT NULL · <code>model_version</code> VARCHAR(60) NULL · <code>quality_score</code> DECIMAL NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>objects</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>name</code> VARCHAR(100) NOT NULL · <code>category</code> VARCHAR(80) NULL · <code>is_active</code> BOOLEAN NOT NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>object_observations</strong> — <code>id</code> PK · <code>object_id</code> FK objects.id NOT NULL · <code>patient_id</code> FK patients.id NOT NULL · <code>observed_at</code> TIMESTAMP NOT NULL · <code>location_label</code> VARCHAR(160) NULL · <code>latitude</code>/<code>longitude</code> DECIMAL NULL · <code>confidence</code> DECIMAL NULL · <code>image_ref</code> TEXT NULL (controlled reference if image retained)</p>
+<p><strong>conversations</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>recognized_person_id</code> FK people.id NULL · <code>started_at</code> TIMESTAMP NOT NULL · <code>ended_at</code> TIMESTAMP NULL · <code>source</code> VARCHAR(40) NOT NULL (VOICE/TEXT/OTHER) · <code>retention_status</code> VARCHAR(30) NOT NULL</p>
+<p><strong>conversation_messages</strong> — <code>id</code> PK · <code>conversation_id</code> FK conversations.id NOT NULL · <code>speaker_type</code> VARCHAR(30) NOT NULL (PATIENT/PERSON/SYSTEM) · <code>content</code> TEXT NOT NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>memories</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>source_type</code> VARCHAR(40) NOT NULL (CONVERSATION/OBJECT/EVENT/OTHER) · <code>source_id</code> NOT NULL · <code>content_ref</code> TEXT NULL · <code>vector_ref</code> TEXT NOT NULL · <code>recognized_person_id</code> FK people.id NULL · <code>event_time</code> TIMESTAMP NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>medications</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>name</code> VARCHAR(160) NOT NULL · <code>dosage_text</code> VARCHAR(160) NULL · <code>instructions</code> TEXT NULL · <code>is_active</code> BOOLEAN NOT NULL · <code>created_at</code>, <code>updated_at</code> TIMESTAMP</p>
+<p><strong>medication_schedules</strong> — <code>id</code> PK · <code>medication_id</code> FK medications.id NOT NULL · <code>time_of_day</code> TIME NOT NULL · <code>recurrence_rule</code> TEXT NOT NULL · <code>start_date</code>/<code>end_date</code> DATE NULL · <code>is_active</code> BOOLEAN NOT NULL</p>
+<p><strong>appointments</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>title</code> VARCHAR(180) NOT NULL · <code>start_at</code> TIMESTAMP NOT NULL · <code>end_at</code> TIMESTAMP NULL · <code>location</code> VARCHAR(255) NULL · <code>notes</code> TEXT NULL · <code>created_by</code> FK users.id NOT NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>daily_schedules</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>title</code> VARCHAR(180) NOT NULL · <code>scheduled_time</code> TIME NOT NULL · <code>recurrence_rule</code> TEXT NOT NULL · <code>priority</code> VARCHAR(20) NULL · <code>is_active</code> BOOLEAN NOT NULL</p>
+<p><strong>reminders</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>type</code> VARCHAR(40) NOT NULL (MEDICATION/APPOINTMENT/ROUTINE/OTHER) · <code>reference_id</code> NULL · <code>scheduled_at</code> TIMESTAMP NOT NULL · <code>message</code> VARCHAR(255) NOT NULL · <code>status</code> VARCHAR(30) NOT NULL (PENDING/SENT/ACKNOWLEDGED/MISSED)</p>
+<p><strong>geofences</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>name</code> VARCHAR(120) NOT NULL · <code>latitude</code>/<code>longitude</code> DECIMAL NOT NULL · <code>radius_m</code> DECIMAL NOT NULL · <code>is_active</code> BOOLEAN NOT NULL · <code>created_by</code> FK users.id NOT NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>locations</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>latitude</code>/<code>longitude</code> DECIMAL NOT NULL · <code>accuracy_m</code> DECIMAL NULL · <code>recorded_at</code> TIMESTAMP NOT NULL · <code>source</code> VARCHAR(40) NOT NULL (GPS/network/test)</p>
+<p><strong>alerts</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>type</code> VARCHAR(50) NOT NULL (GEOFENCE/MEDICATION/SYSTEM/OTHER) · <code>severity</code> VARCHAR(20) NOT NULL (INFO/WARNING/HIGH) · <code>message</code> TEXT NOT NULL · <code>location_id</code> FK locations.id NULL · <code>created_at</code> TIMESTAMP · <code>acknowledged_at</code> TIMESTAMP NULL · <code>acknowledged_by</code> FK users.id NULL</p>
+<p><strong>activity_logs</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NULL · <code>actor_user_id</code> FK users.id NULL · <code>event_type</code> VARCHAR(80) NOT NULL · <code>event_data</code> JSON NULL · <code>created_at</code> TIMESTAMP</p>
+<p><strong>assistant_sessions</strong> — <code>id</code> PK · <code>patient_id</code> FK patients.id NOT NULL · <code>started_at</code> TIMESTAMP NOT NULL · <code>ended_at</code> TIMESTAMP NULL · <code>mode</code> VARCHAR(30) NOT NULL (TEXT/VOICE) · <code>context_person_id</code> FK people.id NULL</p>
+<h3 id="84-key-relationships-and-cardinalities">8.4 Key Relationships and Cardinalities</h3>
+<table>
+<thead>
+<tr>
+<th>Relationship</th>
+<th>Cardinality</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User → Patient</td>
+<td>1 : 0..1</td>
+<td>Patient profile belongs to one user account</td>
+</tr>
+<tr>
+<td>User → Caregiver</td>
+<td>1 : 0..1</td>
+<td>Caregiver profile belongs to one user account</td>
+</tr>
+<tr>
+<td>Caregiver ↔ Patient</td>
+<td>M:N</td>
+<td>Use <code>caregiver_patient</code> for explicit authorization</td>
+</tr>
+<tr>
+<td>Patient → Person</td>
+<td>1:N</td>
+<td>Patient can have multiple familiar people</td>
+</tr>
+<tr>
+<td>Person → FaceEmbedding</td>
+<td>1:N</td>
+<td>Multiple recognition representations may exist</td>
+</tr>
+<tr>
+<td>Patient → Object</td>
+<td>1:N</td>
+<td>Patient context contains tracked objects</td>
+</tr>
+<tr>
+<td>Object → Observation</td>
+<td>1:N</td>
+<td>Each object can have many observations</td>
+</tr>
+<tr>
+<td>Patient → Conversation</td>
+<td>1:N</td>
+<td>Patient has multiple conversations</td>
+</tr>
+<tr>
+<td>Conversation → Message</td>
+<td>1:N</td>
+<td>Conversation contains messages</td>
+</tr>
+<tr>
+<td>Conversation/Event → Memory</td>
+<td>1:N</td>
+<td>Memory records are vector-search metadata</td>
+</tr>
+<tr>
+<td>Patient → Medication</td>
+<td>1:N</td>
+<td>Patient can have multiple medications</td>
+</tr>
+<tr>
+<td>Medication → MedicationSchedule</td>
+<td>1:N</td>
+<td>Medication can have multiple schedules</td>
+</tr>
+<tr>
+<td>Patient → Appointment</td>
+<td>1:N</td>
+<td>Appointments belong to patient</td>
+</tr>
+<tr>
+<td>Patient → DailySchedule</td>
+<td>1:N</td>
+<td>Routine activities belong to patient</td>
+</tr>
+<tr>
+<td>Patient → Reminder</td>
+<td>1:N</td>
+<td>Generated reminder occurrences belong to patient</td>
+</tr>
+<tr>
+<td>Patient → Geofence</td>
+<td>1:N</td>
+<td>Multiple safe zones may be configured</td>
+</tr>
+<tr>
+<td>Patient → Location</td>
+<td>1:N</td>
+<td>Location events are time-series records</td>
+</tr>
+<tr>
+<td>Patient → Alert</td>
+<td>1:N</td>
+<td>Alerts belong to patient</td>
+</tr>
+</tbody>
+</table>
+<h3 id="85-indexing-strategy">8.5 Indexing Strategy</h3>
+<ul>
+<li><code>users.email</code> — unique index</li>
+<li><code>caregiver_patient(caregiver_id, patient_id)</code> — composite unique/index</li>
+<li><code>object_observations(object_id, observed_at DESC)</code> — fast last-seen retrieval</li>
+<li><code>conversations(patient_id, started_at DESC)</code></li>
+<li><code>memories(patient_id, event_time DESC)</code></li>
+<li><code>memories(patient_id, recognized_person_id)</code> — person-aware retrieval metadata</li>
+<li><code>medication_schedules(medication_id, time_of_day)</code></li>
+<li><code>reminders(patient_id, scheduled_at, status)</code></li>
+<li><code>locations(patient_id, recorded_at DESC)</code></li>
+<li><code>alerts(patient_id, created_at DESC, acknowledged_at)</code></li>
+<li><code>activity_logs(patient_id, created_at DESC)</code></li>
+</ul>
+<h3 id="86-data-retention-and-privacy-rules">8.6 Data Retention and Privacy Rules</h3>
+<ul>
+<li>Raw camera frames should not be persisted by default unless required for a defined feature</li>
+<li>Raw audio should not be persisted by default; transcripts retained only per project retention policy</li>
+<li>Face embeddings require controlled access and should be deletable when a familiar-person profile is revoked</li>
+<li>Location history should have a defined retention window; avoid indefinite tracking by default</li>
+<li>Conversation memory should have an explicit retention status and deletion path</li>
+<li>Caregiver access must always be checked against <code>caregiver_patient</code> authorization</li>
+</ul>
+<h3 id="87-implementation-notes">8.7 Implementation Notes</h3>
+<p>The schema is database-agnostic at the logical level. A Django implementation can map these entities to Django models and migrations. UUIDs are recommended where practical. JSON fields may be used for flexible metadata, but core business fields should remain typed relational columns.</p>
+<hr />
+<h2 id="9-api-specification">9. API Specification</h2>
+<h3 id="91-conventions">9.1 Conventions</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Baseline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Style</td>
+<td>REST/JSON over HTTPS on supported deployment</td>
+</tr>
+<tr>
+<td>Base URL</td>
+<td><code>/api/v1</code></td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>Bearer access token; refresh mechanism may be used</td>
+</tr>
+<tr>
+<td>Content-Type</td>
+<td><code>application/json</code> unless multipart upload is explicitly required</td>
+</tr>
+<tr>
+<td>IDs</td>
+<td>UUID recommended</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>ISO 8601 timestamps; patient timezone used for display/reminders</td>
+</tr>
+<tr>
+<td>Errors</td>
+<td>Consistent JSON error object</td>
+</tr>
+<tr>
+<td>Pagination</td>
+<td><code>page</code>/<code>page_size</code> or cursor for list endpoints</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Success:</strong> <code>{"success": true, "data": {...}, "meta": {...}}</code>
+<strong>Error:</strong> <code>{"success": false, "error": {"code": "ERROR_CODE", "message": "Human-readable message"}}</code></p>
+<h3 id="92-authentication-apis">9.2 Authentication APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/auth/login</td>
+<td>Public</td>
+<td>Authenticate user</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/auth/refresh</td>
+<td>Refresh</td>
+<td>Issue/refresh access token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/auth/logout</td>
+<td>Bearer</td>
+<td>Invalidate/logout session if supported</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/auth/me</td>
+<td>Bearer</td>
+<td>Return current user and role</td>
+</tr>
+</tbody>
+</table>
+<h3 id="93-patient-and-caregiver-apis">9.3 Patient and Caregiver APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/patients/me</td>
+<td>Patient/Caregiver</td>
+<td>Current patient profile or authorized patient context</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients</td>
+<td>Caregiver</td>
+<td>List authorized patients</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}</td>
+<td>Caregiver</td>
+<td>Get patient profile</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/patients/{patient_id}</td>
+<td>Caregiver</td>
+<td>Update patient profile</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/caregivers/me</td>
+<td>Caregiver</td>
+<td>Current caregiver profile</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/caregivers</td>
+<td>Caregiver</td>
+<td>List authorized caregivers</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/caregivers</td>
+<td>Caregiver/Admin</td>
+<td>Authorize caregiver</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/patients/{patient_id}/caregivers/{caregiver_id}</td>
+<td>Caregiver/Admin</td>
+<td>Revoke authorization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="94-schedule-and-calendar-apis">9.4 Schedule and Calendar APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/schedule</td>
+<td>Patient/Caregiver</td>
+<td>Get daily/recurring schedule</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/schedule</td>
+<td>Caregiver</td>
+<td>Create routine item</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/schedule/{schedule_id}</td>
+<td>Caregiver</td>
+<td>Update routine</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/schedule/{schedule_id}</td>
+<td>Caregiver</td>
+<td>Deactivate/delete routine</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/appointments</td>
+<td>Patient/Caregiver</td>
+<td>List appointments</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/appointments</td>
+<td>Caregiver</td>
+<td>Create appointment</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/appointments/{appointment_id}</td>
+<td>Patient/Caregiver</td>
+<td>Get appointment</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/appointments/{appointment_id}</td>
+<td>Caregiver</td>
+<td>Update appointment</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/appointments/{appointment_id}</td>
+<td>Caregiver</td>
+<td>Delete appointment</td>
+</tr>
+</tbody>
+</table>
+<h3 id="95-medication-and-reminder-apis">9.5 Medication and Reminder APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/medications</td>
+<td>Patient/Caregiver</td>
+<td>List medications</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/medications</td>
+<td>Caregiver</td>
+<td>Create medication</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/medications/{medication_id}</td>
+<td>Patient/Caregiver</td>
+<td>Get medication</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/medications/{medication_id}</td>
+<td>Caregiver</td>
+<td>Update medication</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/medications/{medication_id}</td>
+<td>Caregiver</td>
+<td>Deactivate medication</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/medications/{medication_id}/schedules</td>
+<td>Caregiver</td>
+<td>Create medication schedule</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/medication-schedules/{schedule_id}</td>
+<td>Caregiver</td>
+<td>Update schedule</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/medication-schedules/{schedule_id}</td>
+<td>Caregiver</td>
+<td>Deactivate schedule</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/reminders</td>
+<td>Patient/Caregiver</td>
+<td>List reminders</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/reminders/{reminder_id}/acknowledge</td>
+<td>Patient</td>
+<td>Mark reminder acknowledged</td>
+</tr>
+</tbody>
+</table>
+<h3 id="96-familiar-people-face-recognition-apis">9.6 Familiar People &amp; Face Recognition APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/people</td>
+<td>Patient/Caregiver</td>
+<td>List familiar people</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/people</td>
+<td>Caregiver</td>
+<td>Register familiar person</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/people/{person_id}</td>
+<td>Patient/Caregiver</td>
+<td>Get person profile</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/people/{person_id}</td>
+<td>Caregiver</td>
+<td>Update person</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/people/{person_id}</td>
+<td>Caregiver</td>
+<td>Deactivate/revoke person</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/people/{person_id}/face-embeddings</td>
+<td>Caregiver</td>
+<td>Register supported face representation</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/face/recognize</td>
+<td>Patient</td>
+<td>Recognize a face from supported input</td>
+</tr>
+</tbody>
+</table>
+<h3 id="97-object-intelligence-apis">9.7 Object Intelligence APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/objects/detect</td>
+<td>Patient</td>
+<td>Submit supported image/frame for object detection</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/objects</td>
+<td>Patient/Caregiver</td>
+<td>List tracked objects</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/objects</td>
+<td>Patient/Caregiver</td>
+<td>Create/register object</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/objects/{object_id}/observations</td>
+<td>Patient/Caregiver</td>
+<td>List object observations</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/objects/{object_id}/last-seen</td>
+<td>Patient/Caregiver</td>
+<td>Return latest valid observation</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/objects/query</td>
+<td>Patient</td>
+<td>Natural-language/object-name query for last-seen retrieval</td>
+</tr>
+</tbody>
+</table>
+<h3 id="98-conversation-and-rag-apis">9.8 Conversation and RAG APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/conversations</td>
+<td>Patient</td>
+<td>Create conversation session</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/conversations/{conversation_id}/messages</td>
+<td>Patient</td>
+<td>Store a message/transcript segment</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/memory/ingest</td>
+<td>Patient/System</td>
+<td>Create searchable memory from eligible content</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/memory/search</td>
+<td>Patient/System</td>
+<td>Semantic memory search</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/conversations</td>
+<td>Patient/Caregiver</td>
+<td>List permitted conversation metadata</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/conversations/{conversation_id}</td>
+<td>Patient/Caregiver</td>
+<td>Delete/retire conversation per retention policy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="99-personal-ai-assistant-api">9.9 Personal AI Assistant API</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/assistant/sessions</td>
+<td>Patient</td>
+<td>Start assistant session</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/assistant/query</td>
+<td>Patient</td>
+<td>Ask typed/voice-derived question</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/assistant/sessions/{session_id}</td>
+<td>Patient</td>
+<td>Retrieve session metadata</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/assistant/sessions/{session_id}/end</td>
+<td>Patient</td>
+<td>End session</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Assistant Query Contract</strong> — example request:</p>
+<pre><code class="language-json">{&quot;patient_id&quot;:&quot;...&quot;, &quot;query&quot;:&quot;Where did I keep my keys?&quot;, &quot;mode&quot;:&quot;text&quot;, &quot;context_person_id&quot;:null}
+</code></pre>
+<p>example response:</p>
+<pre><code class="language-json">{&quot;success&quot;:true,&quot;data&quot;:{&quot;answer&quot;:&quot;Your keys were last detected near the study table.&quot;,&quot;sources&quot;:[{&quot;type&quot;:&quot;object_observation&quot;,&quot;id&quot;:&quot;...&quot;,&quot;observed_at&quot;:&quot;...&quot;}],&quot;confidence&quot;:&quot;medium&quot;}}
+</code></pre>
+<p>The assistant uses deterministic APIs for schedule/medication facts and RAG/vector retrieval for conversational memory — it should not invent missing information.</p>
+<h3 id="910-geofencing-and-location-apis">9.10 Geofencing and Location APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/geofences</td>
+<td>Caregiver</td>
+<td>List safe zones</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/geofences</td>
+<td>Caregiver</td>
+<td>Create safe zone</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>/geofences/{geofence_id}</td>
+<td>Caregiver</td>
+<td>Update safe zone</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/geofences/{geofence_id}</td>
+<td>Caregiver</td>
+<td>Deactivate safe zone</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/locations</td>
+<td>Patient/System</td>
+<td>Submit location event</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/locations/latest</td>
+<td>Caregiver</td>
+<td>Get latest location</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/alerts</td>
+<td>Caregiver/Patient</td>
+<td>List alerts</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/alerts/{alert_id}/acknowledge</td>
+<td>Caregiver</td>
+<td>Acknowledge alert</td>
+</tr>
+</tbody>
+</table>
+<h3 id="911-well-being-apis">9.11 Well-being APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/wellbeing/content</td>
+<td>Patient</td>
+<td>List meditation/relaxation content</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/wellbeing/content/{content_id}</td>
+<td>Patient</td>
+<td>Get content metadata</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/patients/{patient_id}/wellbeing/sessions</td>
+<td>Patient</td>
+<td>Record a session start</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/wellbeing/sessions/{session_id}/end</td>
+<td>Patient</td>
+<td>Record session completion</td>
+</tr>
+</tbody>
+</table>
+<h3 id="912-activity-and-audit-apis">9.12 Activity and Audit APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/activity</td>
+<td>Caregiver/Patient</td>
+<td>View permitted activity history</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/patients/{patient_id}/audit</td>
+<td>Authorized admin/caregiver</td>
+<td>View permitted security/configuration events</td>
+</tr>
+</tbody>
+</table>
+<h3 id="913-request-validation">9.13 Request Validation</h3>
+<table>
+<thead>
+<tr>
+<th>API Area</th>
+<th>Required Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auth</td>
+<td>Credential presence; account active; rate limiting where deployed</td>
+</tr>
+<tr>
+<td>Medication</td>
+<td>Name required; schedule valid; patient authorization</td>
+</tr>
+<tr>
+<td>Appointment</td>
+<td>Title/start time required; patient authorization</td>
+</tr>
+<tr>
+<td>Schedule</td>
+<td>Title/time/recurrence required</td>
+</tr>
+<tr>
+<td>Person</td>
+<td>Name required; patient authorization</td>
+</tr>
+<tr>
+<td>Face</td>
+<td>Supported image/input; person registration authorization</td>
+</tr>
+<tr>
+<td>Object</td>
+<td>Supported media; object confidence threshold; patient context</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>Patient context; source; content/vector reference</td>
+</tr>
+<tr>
+<td>Geofence</td>
+<td>Valid coordinates; positive radius; caregiver authorization</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>Valid coordinates and timestamp; authenticated patient/device</td>
+</tr>
+<tr>
+<td>Assistant</td>
+<td>Non-empty query; authenticated patient; context authorization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="914-http-status-codes">9.14 HTTP Status Codes</h3>
+<p><code>200</code> success · <code>201</code> created · <code>204</code> deleted/deactivated, no body · <code>400</code> validation error · <code>401</code> unauthenticated · <code>403</code> unauthorized · <code>404</code> not found/not visible · <code>409</code> conflict/duplicate · <code>422</code> semantically invalid (if framework used) · <code>429</code> rate limited · <code>500</code> unexpected server error · <code>503</code> dependent AI/notification service unavailable</p>
+<h3 id="915-security-requirements-for-apis">9.15 Security Requirements for APIs</h3>
+<ul>
+<li>Every protected endpoint must perform authentication</li>
+<li>Every patient-specific endpoint must enforce patient/caregiver authorization</li>
+<li>Do not trust client-supplied <code>patient_id</code> without authorization checks</li>
+<li>Do not expose raw face embeddings to ordinary clients</li>
+<li>Do not expose internal vector-store identifiers unless needed</li>
+<li>Validate uploaded media type and size</li>
+<li>Apply rate limits to authentication, face recognition and assistant endpoints where practical</li>
+<li>Log security-sensitive actions without logging unnecessary sensitive content</li>
+</ul>
+<h3 id="916-api-dependency-flow">9.16 API Dependency Flow</h3>
+<ol>
+<li>Mobile app authenticates → receives access token</li>
+<li>Mobile app requests schedule/medication → backend queries relational database</li>
+<li>Camera frame → object/face service → backend stores result</li>
+<li>Conversation → STT → memory ingestion → embedding/vector store</li>
+<li>Assistant query → intent/context routing → structured DB and/or vector search → LLM → response</li>
+<li>GPS event → geofence evaluator → alert record → notification</li>
+</ol>
+<hr />
+<h2 id="10-uiux-design-screen-flow">10. UI/UX Design &amp; Screen Flow</h2>
+<h3 id="101-ux-principles">10.1 UX Principles</h3>
+<ul>
+<li>Keep the number of choices visible at one time low</li>
+<li>Use large touch targets, clear labels and consistent iconography</li>
+<li>Prefer plain language over technical terminology</li>
+<li>Use persistent access to the most important functions: Assistant, Reminders, Schedule and Help</li>
+<li>Make important information visible without requiring deep navigation</li>
+<li>Never make a recognition result look more certain than it actually is</li>
+<li>Use confirmation for potentially consequential caregiver actions</li>
+<li>Provide obvious recovery paths when AI recognition or connectivity fails</li>
+<li>Maintain the same terminology throughout the patient and caregiver experiences</li>
+</ul>
+<h3 id="102-application-structure">10.2 Application Structure</h3>
+<table>
+<thead>
+<tr>
+<th>Application</th>
+<th>Primary User</th>
+<th>Primary Navigation</th>
+<th>Main Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Patient App</td>
+<td>Patient</td>
+<td>Home / Assistant / Schedule / Reminders / Memory / More</td>
+<td>Daily assistance and independent interaction</td>
+</tr>
+<tr>
+<td>Caregiver App</td>
+<td>Caregiver</td>
+<td>Dashboard / Patient / Schedule / Medications / Alerts / Settings</td>
+<td>Monitoring, configuration and safety</td>
+</tr>
+</tbody>
+</table>
+<h3 id="103-patient-app-navigation-map">10.3 Patient App — Navigation Map</h3>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>Name</th>
+<th>Entry</th>
+<th>Main Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P-01</td>
+<td>Welcome / Login</td>
+<td>App launch</td>
+<td>Login, account recovery</td>
+</tr>
+<tr>
+<td>P-02</td>
+<td>Home</td>
+<td>Login</td>
+<td>View today, reminders, next event, assistant</td>
+</tr>
+<tr>
+<td>P-03</td>
+<td>AI Assistant</td>
+<td>Home / voice shortcut</td>
+<td>Ask question, receive answer, access sources/context</td>
+</tr>
+<tr>
+<td>P-04</td>
+<td>People Recognition</td>
+<td>Camera/Assistant</td>
+<td>Recognize familiar person</td>
+</tr>
+<tr>
+<td>P-05</td>
+<td>Object Finder</td>
+<td>Home / Assistant</td>
+<td>Ask where an object was last seen</td>
+</tr>
+<tr>
+<td>P-06</td>
+<td>Schedule</td>
+<td>Home</td>
+<td>View day/week routine</td>
+</tr>
+<tr>
+<td>P-07</td>
+<td>Calendar</td>
+<td>Home / Schedule</td>
+<td>View appointments</td>
+</tr>
+<tr>
+<td>P-08</td>
+<td>Reminders</td>
+<td>Home</td>
+<td>View pending/completed reminders</td>
+</tr>
+<tr>
+<td>P-09</td>
+<td>Reminder Detail</td>
+<td>Reminder</td>
+<td>Acknowledge/remind later</td>
+</tr>
+<tr>
+<td>P-10</td>
+<td>Medication</td>
+<td>Reminders / Schedule</td>
+<td>View medication instruction</td>
+</tr>
+<tr>
+<td>P-11</td>
+<td>Memory / Conversation</td>
+<td>Assistant / People</td>
+<td>View permitted remembered context</td>
+</tr>
+<tr>
+<td>P-12</td>
+<td>Well-being</td>
+<td>Home / More</td>
+<td>Meditation and therapeutic tones</td>
+</tr>
+<tr>
+<td>P-13</td>
+<td>Location / Safety</td>
+<td>More</td>
+<td>View safety state if exposed to patient</td>
+</tr>
+<tr>
+<td>P-14</td>
+<td>Settings</td>
+<td>More</td>
+<td>Language, accessibility, privacy and account</td>
+</tr>
+<tr>
+<td>P-15</td>
+<td>Help / Emergency</td>
+<td>Home / More</td>
+<td>Help instructions and configured emergency action</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Home (P-02)</strong> should answer three questions immediately: <em>"What do I need to do?"</em>, <em>"What is next?"</em>, and <em>"Can I ask for help?"</em> — elements: greeting, current time/date, next reminder, today's schedule, Assistant button (primary), Find-an-object shortcut, Who-is-this shortcut, Well-being shortcut, optional compact safety-state indicator.</p>
+<p><strong>AI Assistant (P-03)</strong> — text and (if implemented) voice input; context = current patient, recent schedule/reminders, recognized person, object observations, permitted memories; short direct answer first with optional supporting context; states uncertainty rather than inventing an answer; supports follow-up without restarting the session. Quick prompts: <em>"Where are my keys?"</em>, <em>"Who is this?"</em>, <em>"What do I have today?"</em>, <em>"When is my appointment?"</em></p>
+<p><strong>Person Recognition Flow:</strong> open "Who is this?" or camera detects a face → capture frame → face detection → recognition compared against registered people → match above threshold shows name/relationship → no reliable match shows <em>"I'm not sure who this is"</em> → recognized person's permitted memory can inform the conversation.</p>
+<p><strong>Object Finder Flow:</strong> select "Find an object" or ask the assistant → identify requested object → retrieve latest observation → display last detected location/time/confidence/context → no observation shows <em>"I don't have a recent location for that item"</em> → never presents an old observation as guaranteed current location.</p>
+<p><strong>Reminder Flow states:</strong> Upcoming (card with time/action) → Due now (prominent notification) → Acknowledged (marked complete) → Snoozed (shows next reminder time) → Missed (clearly marked; caregiver notification may trigger per configuration).</p>
+<p><strong>Schedule &amp; Calendar Flow:</strong> default view opens to today; upcoming event visually emphasized; completed items remain visible but secondary; appointments show time/title/location; medication events visually distinguishable.</p>
+<p><strong>Well-being (P-12):</strong> meditation (selectable guided session with duration), therapeutic tones (selectable audio/tonal content), session state (play/pause/stop), completion recorded only if user chooses or requirements define automatic recording; content is supportive, never a substitute for professional treatment.</p>
+<h3 id="104-caregiver-app-navigation-map">10.4 Caregiver App — Navigation Map</h3>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>Name</th>
+<th>Main Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C-01</td>
+<td>Login</td>
+<td>Authenticate caregiver</td>
+</tr>
+<tr>
+<td>C-02</td>
+<td>Dashboard</td>
+<td>Overview of patients, reminders, alerts and recent activity</td>
+</tr>
+<tr>
+<td>C-03</td>
+<td>Patient Overview</td>
+<td>View one patient's status</td>
+</tr>
+<tr>
+<td>C-04</td>
+<td>Daily Schedule</td>
+<td>Create/edit routines</td>
+</tr>
+<tr>
+<td>C-05</td>
+<td>Calendar</td>
+<td>Create/edit appointments</td>
+</tr>
+<tr>
+<td>C-06</td>
+<td>Medication</td>
+<td>Create/edit medication and timing</td>
+</tr>
+<tr>
+<td>C-07</td>
+<td>Reminders</td>
+<td>Review reminder status</td>
+</tr>
+<tr>
+<td>C-08</td>
+<td>People</td>
+<td>Register familiar people</td>
+</tr>
+<tr>
+<td>C-09</td>
+<td>Objects</td>
+<td>Manage tracked objects / inspect last-seen observations</td>
+</tr>
+<tr>
+<td>C-10</td>
+<td>Location &amp; Geofence</td>
+<td>Configure safe zones and view latest location</td>
+</tr>
+<tr>
+<td>C-11</td>
+<td>Alerts</td>
+<td>Review and acknowledge alerts</td>
+</tr>
+<tr>
+<td>C-12</td>
+<td>Conversation / Memory</td>
+<td>Review permitted memory metadata/content</td>
+</tr>
+<tr>
+<td>C-13</td>
+<td>Well-being</td>
+<td>Configure or review supported well-being content</td>
+</tr>
+<tr>
+<td>C-14</td>
+<td>Settings &amp; Permissions</td>
+<td>Manage access, privacy and preferences</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dashboard (C-02) widgets:</strong> patient status, today's schedule, medication (next event + acknowledgement state), appointments (nearest), alerts (unacknowledged), location (latest, if enabled/authorized), recent activity, quick actions (add medication/appointment/schedule item/person/geofence).</p>
+<p><strong>Patient Overview (C-03):</strong> overview → specific detail without navigating through unrelated screens — patient profile/preferences, today's schedule and next event, medication status, recent alerts, latest location/geofence status, recent object observations, recent permitted conversation/memory activity.</p>
+<p><strong>Geofencing UI (C-10):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>UI Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create zone</td>
+<td>Map/location selection + name + radius</td>
+</tr>
+<tr>
+<td>Edit zone</td>
+<td>Change name/radius/active state</td>
+</tr>
+<tr>
+<td>Disable zone</td>
+<td>Require confirmation</td>
+</tr>
+<tr>
+<td>Exit event</td>
+<td>Show alert with patient, zone and time</td>
+</tr>
+<tr>
+<td>Latest location</td>
+<td>Show timestamp and accuracy</td>
+</tr>
+<tr>
+<td>No location</td>
+<td>Clearly state that current location is unavailable rather than implying the patient is safe</td>
+</tr>
+</tbody>
+</table>
+<h3 id="105-common-ui-states">10.5 Common UI States</h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Required Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Loading</td>
+<td>Show simple progress indicator and retain context</td>
+</tr>
+<tr>
+<td>Empty</td>
+<td>Explain what is missing and give a next action</td>
+</tr>
+<tr>
+<td>Offline</td>
+<td>Show offline state and avoid claiming live results</td>
+</tr>
+<tr>
+<td>AI unavailable</td>
+<td>Provide deterministic features where possible</td>
+</tr>
+<tr>
+<td>Recognition uncertain</td>
+<td>Use uncertainty language and allow retry</td>
+</tr>
+<tr>
+<td>Permission denied</td>
+<td>Explain which permission is needed and why</td>
+</tr>
+<tr>
+<td>Server error</td>
+<td>Show retry action and non-technical message</td>
+</tr>
+<tr>
+<td>Unauthorized</td>
+<td>Do not reveal another patient's data</td>
+</tr>
+</tbody>
+</table>
+<h3 id="106-accessibility-requirements">10.6 Accessibility Requirements</h3>
+<ul>
+<li>Large, readable text with scalable typography</li>
+<li>High contrast between text and background</li>
+<li>Buttons large enough for reliable touch input</li>
+<li>Do not rely on color alone to communicate state</li>
+<li>Support screen readers where the chosen framework permits</li>
+<li>Use both icon and text for important actions</li>
+<li>Keep interaction patterns consistent across screens</li>
+</ul>
+<h3 id="107-screen-to-api-mapping">10.7 Screen-to-API Mapping</h3>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>Primary APIs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P-02 Home</td>
+<td>/patients/me, /schedule, /reminders, /appointments</td>
+</tr>
+<tr>
+<td>P-03 Assistant</td>
+<td>/assistant/sessions, /assistant/query</td>
+</tr>
+<tr>
+<td>P-04 Recognition</td>
+<td>/face/recognize</td>
+</tr>
+<tr>
+<td>P-05 Object Finder</td>
+<td>/objects/query, /objects/{id}/last-seen</td>
+</tr>
+<tr>
+<td>P-06 Schedule</td>
+<td>/patients/{id}/schedule</td>
+</tr>
+<tr>
+<td>P-07 Calendar</td>
+<td>/patients/{id}/appointments</td>
+</tr>
+<tr>
+<td>P-08/P-09 Reminders</td>
+<td>/patients/{id}/reminders, /reminders/{id}/acknowledge</td>
+</tr>
+<tr>
+<td>P-12 Well-being</td>
+<td>/wellbeing/content, /wellbeing/sessions</td>
+</tr>
+<tr>
+<td>C-02 Dashboard</td>
+<td>patient/schedule/medication/reminder/alert/location APIs</td>
+</tr>
+<tr>
+<td>C-06 Medication</td>
+<td>/patients/{id}/medications, medication schedules</td>
+</tr>
+<tr>
+<td>C-08 People</td>
+<td>/patients/{id}/people, face embeddings</td>
+</tr>
+<tr>
+<td>C-10 Location</td>
+<td>/geofences, /locations, /alerts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="108-mvp-vs-later-features">10.8 MVP vs Later Features</h3>
+<table>
+<thead>
+<tr>
+<th>MVP</th>
+<th>Later / Extension</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login + role separation</td>
+<td>Advanced caregiver roles</td>
+</tr>
+<tr>
+<td>Patient Home</td>
+<td>Personalized adaptive UI</td>
+</tr>
+<tr>
+<td>Schedule + calendar</td>
+<td>External calendar integrations</td>
+</tr>
+<tr>
+<td>Medication reminders</td>
+<td>Advanced adherence analytics</td>
+</tr>
+<tr>
+<td>Object last-seen</td>
+<td>More complex multi-camera tracking</td>
+</tr>
+<tr>
+<td>Face recognition</td>
+<td>Improved identity/context reasoning</td>
+</tr>
+<tr>
+<td>Basic RAG memory</td>
+<td>Long-term memory policies and summarization</td>
+</tr>
+<tr>
+<td>Basic assistant</td>
+<td>More advanced multimodal dialogue</td>
+</tr>
+<tr>
+<td>Basic geofence</td>
+<td>More sophisticated route/safety analysis</td>
+</tr>
+<tr>
+<td>Meditation/tones</td>
+<td>Personalized well-being recommendations</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-use-cases">11. Use Cases</h2>
+<h3 id="111-use-case-catalogue">11.1 Use Case Catalogue</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Use Case</th>
+<th>Actor</th>
+<th>Precondition</th>
+<th>Success Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-01</td>
+<td>Authenticate User</td>
+<td>Patient/Caregiver</td>
+<td>Valid account exists</td>
+<td>Successful authentication and role-specific home screen</td>
+</tr>
+<tr>
+<td>UC-02</td>
+<td>View Daily Schedule</td>
+<td>Patient</td>
+<td>Schedule exists</td>
+<td>Today's activities displayed</td>
+</tr>
+<tr>
+<td>UC-03</td>
+<td>Manage Schedule</td>
+<td>Caregiver</td>
+<td>Authorized patient selected</td>
+<td>Schedule saved/updated</td>
+</tr>
+<tr>
+<td>UC-04</td>
+<td>Manage Medication</td>
+<td>Caregiver</td>
+<td>Authorized patient selected</td>
+<td>Medication and timing stored</td>
+</tr>
+<tr>
+<td>UC-05</td>
+<td>Receive Medication Reminder</td>
+<td>Patient</td>
+<td>Active medication schedule exists</td>
+<td>Reminder delivered at configured time</td>
+</tr>
+<tr>
+<td>UC-06</td>
+<td>Find Misplaced Object</td>
+<td>Patient</td>
+<td>Object has a recent observation</td>
+<td>Last detected location and time returned</td>
+</tr>
+<tr>
+<td>UC-07</td>
+<td>Recognize Familiar Person</td>
+<td>Patient/System</td>
+<td>Person is registered; camera available</td>
+<td>Identity and relationship cue displayed</td>
+</tr>
+<tr>
+<td>UC-08</td>
+<td>Retrieve Conversation Memory</td>
+<td>Patient/System</td>
+<td>Relevant memory exists</td>
+<td>Contextual memory retrieved and used in response</td>
+</tr>
+<tr>
+<td>UC-09</td>
+<td>Ask Personal AI Assistant</td>
+<td>Patient</td>
+<td>Assistant service available</td>
+<td>Answer returned from structured data and/or RAG</td>
+</tr>
+<tr>
+<td>UC-10</td>
+<td>Set Safe Zone</td>
+<td>Caregiver</td>
+<td>Location data available</td>
+<td>Geofence stored and activated</td>
+</tr>
+<tr>
+<td>UC-11</td>
+<td>Handle Geofence Violation</td>
+<td>System/Caregiver</td>
+<td>Active geofence; location crosses boundary</td>
+<td>Caregiver alert created and delivered</td>
+</tr>
+<tr>
+<td>UC-12</td>
+<td>Play Well-being Session</td>
+<td>Patient</td>
+<td>Content available</td>
+<td>Selected session plays</td>
+</tr>
+<tr>
+<td>UC-13</td>
+<td>Manage Familiar Person</td>
+<td>Caregiver</td>
+<td>Authorized patient selected</td>
+<td>Person profile/recognition data created or updated</td>
+</tr>
+<tr>
+<td>UC-14</td>
+<td>Review Patient Activity</td>
+<td>Caregiver</td>
+<td>Authorized patient selected</td>
+<td>Relevant activity history displayed</td>
+</tr>
+</tbody>
+</table>
+<h3 id="112-detailed-use-cases">11.2 Detailed Use Cases</h3>
+<p><strong>UC-06 Find Misplaced Object</strong>
+1. Patient selects or speaks the name of an object
+2. System searches recent object observations
+3. If a valid observation exists, the latest is selected
+4. System presents object name, last observed context/location and timestamp
+5. If no observation exists, system states it has no recorded observation</p>
+<p><strong>UC-07 Recognize Familiar Person</strong>
+1. Camera captures a face
+2. System detects the face
+3. System creates a recognition representation
+4. Representation is compared with registered familiar people
+5. If confidence exceeds threshold, name and relationship are displayed
+6. Otherwise the person is treated as unknown</p>
+<p><strong>UC-08 Retrieve Conversation Memory</strong>
+1. Patient asks a memory-related question
+2. System converts voice to text when required
+3. System extracts available person/topic/time context
+4. System retrieves relevant vector memories
+5. Relevant memory is passed to the response generator
+6. System produces a contextual answer and avoids unsupported claims</p>
+<p><strong>UC-11 Handle Geofence Violation</strong>
+1. Caregiver has an active safe zone
+2. Patient device provides a supported location update
+3. System evaluates location against the safe zone
+4. If outside, a violation event is created
+5. Caregiver notification is generated
+6. Event is recorded in activity/alert history</p>
+<h3 id="113-demonstration-scenarios">11.3 Demonstration Scenarios</h3>
+<ul>
+<li><strong>A — Lost object:</strong> Patient asks for keys; system retrieves the latest observation and speaks/displays the result</li>
+<li><strong>B — Familiar person:</strong> Patient points camera at a registered person; system identifies name/relationship</li>
+<li><strong>C — Contextual memory:</strong> Recognized person is associated with a query; system retrieves the relevant previous conversation</li>
+<li><strong>D — Routine:</strong> Patient sees today's schedule and receives a medication reminder</li>
+<li><strong>E — Safety:</strong> Test patient location leaves the safe zone; caregiver receives an alert</li>
+<li><strong>F — Caregiver management:</strong> Caregiver updates medication/schedule and sees the updated status</li>
+</ul>
+<hr />
+<h2 id="12-acceptance-criteria-test-plan">12. Acceptance Criteria &amp; Test Plan</h2>
+<h3 id="121-acceptance-criteria">12.1 Acceptance Criteria</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Area</th>
+<th>Acceptance Criterion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AC-01</td>
+<td>Authentication</td>
+<td>Correct credentials authenticate; incorrect credentials are rejected; role permissions are enforced</td>
+</tr>
+<tr>
+<td>AC-02</td>
+<td>Schedule</td>
+<td>Caregiver creates a schedule item and patient can see it</td>
+</tr>
+<tr>
+<td>AC-03</td>
+<td>Medication</td>
+<td>Medication schedule produces a reminder at the configured time</td>
+</tr>
+<tr>
+<td>AC-04</td>
+<td>Object Finder</td>
+<td>After a test object is detected and stored, querying the object returns its last observation</td>
+</tr>
+<tr>
+<td>AC-05</td>
+<td>Face Recognition</td>
+<td>A registered test person is recognized under supported lighting/distance conditions; unknown test face is not falsely mapped</td>
+</tr>
+<tr>
+<td>AC-06</td>
+<td>RAG</td>
+<td>A stored test conversation can be retrieved using a semantically related query</td>
+</tr>
+<tr>
+<td>AC-07</td>
+<td>Person-Aware RAG</td>
+<td>When a registered person's face is recognized, a related test conversation can be preferentially retrieved</td>
+</tr>
+<tr>
+<td>AC-08</td>
+<td>Assistant</td>
+<td>Assistant answers a schedule/medication query using structured data without hallucinating missing fields</td>
+</tr>
+<tr>
+<td>AC-09</td>
+<td>Geofence</td>
+<td>Crossing a test boundary creates an alert and notification event</td>
+</tr>
+<tr>
+<td>AC-10</td>
+<td>Privacy</td>
+<td>Unauthorized caregiver/user cannot access another patient's protected information</td>
+</tr>
+</tbody>
+</table>
+<h3 id="122-initial-test-plan">12.2 Initial Test Plan</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Test</th>
+<th>Input/Condition</th>
+<th>Expected Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TC-001</td>
+<td>Login with valid credentials</td>
+<td>Valid user account</td>
+<td>Authenticated dashboard shown</td>
+<td>Functional</td>
+</tr>
+<tr>
+<td>TC-002</td>
+<td>Login with invalid credentials</td>
+<td>Wrong password</td>
+<td>Error shown; no session created</td>
+<td>Security/Functional</td>
+</tr>
+<tr>
+<td>TC-003</td>
+<td>Role access test</td>
+<td>Patient account opens caregiver route</td>
+<td>Access denied</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>TC-004</td>
+<td>Create medication</td>
+<td>Caregiver enters valid medication</td>
+<td>Record persists</td>
+<td>Functional</td>
+</tr>
+<tr>
+<td>TC-005</td>
+<td>Medication reminder</td>
+<td>Configured reminder time reached</td>
+<td>Patient reminder generated</td>
+<td>Integration</td>
+</tr>
+<tr>
+<td>TC-006</td>
+<td>Object detection</td>
+<td>Supported object placed in camera view</td>
+<td>Object detected and observation stored</td>
+<td>AI/Functional</td>
+</tr>
+<tr>
+<td>TC-007</td>
+<td>Object retrieval</td>
+<td>Previously stored object queried</td>
+<td>Latest observation returned</td>
+<td>Integration</td>
+</tr>
+<tr>
+<td>TC-008</td>
+<td>Known face</td>
+<td>Registered person's face shown</td>
+<td>Correct profile returned under test conditions</td>
+<td>AI/Functional</td>
+</tr>
+<tr>
+<td>TC-009</td>
+<td>Unknown face</td>
+<td>Unregistered face shown</td>
+<td>Unknown/uncertain result</td>
+<td>AI/Safety</td>
+</tr>
+<tr>
+<td>TC-010</td>
+<td>Conversation ingestion</td>
+<td>Test conversation stored</td>
+<td>Embedding/index record created</td>
+<td>AI/Integration</td>
+</tr>
+<tr>
+<td>TC-011</td>
+<td>RAG query</td>
+<td>Semantically related question</td>
+<td>Relevant memory retrieved</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>TC-012</td>
+<td>Person-aware RAG</td>
+<td>Known person + related query</td>
+<td>Relevant person-associated memory ranked/retrieved</td>
+<td>AI/Integration</td>
+</tr>
+<tr>
+<td>TC-013</td>
+<td>No-memory query</td>
+<td>Question with no matching memory</td>
+<td>System states lack of information</td>
+<td>Safety/AI</td>
+</tr>
+<tr>
+<td>TC-014</td>
+<td>Geofence inside</td>
+<td>Location within radius</td>
+<td>No violation alert</td>
+<td>Functional</td>
+</tr>
+<tr>
+<td>TC-015</td>
+<td>Geofence outside</td>
+<td>Location beyond radius</td>
+<td>Alert generated</td>
+<td>Integration</td>
+</tr>
+<tr>
+<td>TC-016</td>
+<td>Unauthorized patient access</td>
+<td>Caregiver without permission</td>
+<td>Data access rejected</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>TC-017</td>
+<td>AI service failure</td>
+<td>Disable LLM service</td>
+<td>Core schedule/reminder functions remain available</td>
+<td>Reliability</td>
+</tr>
+</tbody>
+</table>
+<h3 id="123-data-validation-rules">12.3 Data Validation Rules</h3>
+<ul>
+<li>Required patient/caregiver identifiers shall not be empty</li>
+<li>Medication name and schedule shall be present before an active medication reminder is created</li>
+<li>Geofence radius shall be a valid positive value</li>
+<li>Face profile shall be linked to a registered person</li>
+<li>Object observation confidence shall be stored when provided by the model</li>
+<li>Conversation memory records shall identify their source and timestamp</li>
+<li>Sensitive data access shall be checked against the authenticated user and patient relationship</li>
+</ul>
+<hr />
+<h2 id="13-traceability-matrix">13. Traceability Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Requirement(s)</th>
+<th>Area</th>
+<th>Design Module</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-003/FR-004</td>
+<td>Schedule</td>
+<td>MOD-03</td>
+<td>TC-004/functional schedule tests</td>
+</tr>
+<tr>
+<td>FR-005/FR-006</td>
+<td>Medication/Reminders</td>
+<td>MOD-04</td>
+<td>TC-005</td>
+</tr>
+<tr>
+<td>FR-009/FR-010/FR-011</td>
+<td>Object Intelligence</td>
+<td>MOD-05</td>
+<td>TC-006/TC-007</td>
+</tr>
+<tr>
+<td>FR-012/FR-014</td>
+<td>Face Intelligence</td>
+<td>MOD-06</td>
+<td>TC-008/TC-009</td>
+</tr>
+<tr>
+<td>FR-016/FR-017/FR-018/FR-019</td>
+<td>RAG</td>
+<td>MOD-07/MOD-08</td>
+<td>TC-010/TC-011/TC-012/TC-013</td>
+</tr>
+<tr>
+<td>FR-020/FR-021/FR-022</td>
+<td>Safety</td>
+<td>MOD-09/MOD-10</td>
+<td>TC-014/TC-015</td>
+</tr>
+<tr>
+<td>FR-001/FR-002</td>
+<td>Security</td>
+<td>MOD-01</td>
+<td>TC-001/TC-002/TC-003/TC-016</td>
+</tr>
+<tr>
+<td>NFR-005</td>
+<td>Reliability</td>
+<td>Cross-module</td>
+<td>TC-017</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Traceability principle:</strong> every implementation module, API, database entity and test case should map back to one or more requirement IDs. Requirements should not be added to the implementation without updating this baseline. Requirement IDs are reused across the design document, API specification, implementation issue list and test cases, forming a direct chain: requirement → design → code → test → demonstration.</p>
+<hr />
+<h2 id="14-constraints-assumptions">14. Constraints &amp; Assumptions</h2>
+<ul>
+<li>The project is intended as a college software project and must remain implementable within the available development time and hardware</li>
+<li>AI performance will depend on the smartphone camera, lighting, microphone quality, model choice and available compute</li>
+<li>Continuous camera/audio/GPS processing can have battery and privacy implications</li>
+<li>Geofencing accuracy depends on device location services and environmental conditions</li>
+<li>RAG quality depends on the quality and amount of stored conversation/event information</li>
+<li>External cloud AI services should not be treated as mandatory — the project emphasizes privacy-preserving/local processing</li>
+</ul>
+<p><strong>Source basis:</strong> the requirements baseline is based on the team's handwritten project feature list and the supplied 19-page project presentation, which describes the problem, six objectives, object-tracking pipeline, conversational RAG pipeline, face recognition/geofencing pipeline, data-flow architecture, technology stack, privacy-first architecture and future scope.</p>
+<hr />
+<h2 id="15-development-order-completion-checklists">15. Development Order &amp; Completion Checklists</h2>
+<h3 id="151-recommended-development-order">15.1 Recommended Development Order</h3>
+<ol>
+<li>Backend project, authentication and RBAC</li>
+<li>Patient/caregiver data model</li>
+<li>Schedule, medication, appointments and reminders</li>
+<li>Patient and caregiver UI</li>
+<li>Object detection and observation storage</li>
+<li>Face recognition and familiar-person management</li>
+<li>Vector store and RAG ingestion/retrieval</li>
+<li>AI assistant orchestration</li>
+<li>Geofencing and alerts</li>
+<li>Voice/TTS and well-being module</li>
+<li>Integration testing, security testing and performance benchmarking</li>
+</ol>
+<h3 id="152-api-implementation-order">15.2 API Implementation Order</h3>
+<ol>
+<li>Auth + users + RBAC</li>
+<li>Patient/caregiver authorization</li>
+<li>Schedule + appointments</li>
+<li>Medication + reminders</li>
+<li>People + face registration</li>
+<li>Objects + observations</li>
+<li>Conversations + memory ingestion</li>
+<li>Memory search + assistant</li>
+<li>Geofences + locations + alerts</li>
+<li>Well-being + activity logging</li>
+</ol>
+<h3 id="153-database-completion-checklist">15.3 Database Completion Checklist</h3>
+<ul>
+<li>All models created</li>
+<li>Foreign-key relationships validated</li>
+<li>Unique constraints added</li>
+<li>Indexes added for common retrieval paths</li>
+<li>Migration generated and applied</li>
+<li>Seed/test data created</li>
+<li>Authorization filters tested</li>
+<li>Delete/retention behavior tested</li>
+<li>Vector-store references tested against relational memory records</li>
+</ul>
+<h3 id="154-api-completion-checklist">15.4 API Completion Checklist</h3>
+<ul>
+<li>OpenAPI/Swagger specification generated from final routes</li>
+<li>Authentication and authorization tested on every protected endpoint</li>
+<li>Request/response schemas documented</li>
+<li>Error responses standardized</li>
+<li>Pagination added to list endpoints where required</li>
+<li>Rate limiting/security controls reviewed</li>
+<li>Integration tests mapped to requirement IDs</li>
+<li>Frontend API client generated/implemented</li>
+</ul>
+<h3 id="155-uiux-sign-off-checklist">15.5 UI/UX Sign-off Checklist</h3>
+<ul>
+<li>Every requirement has a user-facing destination or is explicitly backend-only</li>
+<li>Patient and caregiver navigation are separated</li>
+<li>Every major screen has loading, empty, error and offline states</li>
+<li>Every action is mapped to an API endpoint</li>
+<li>Privacy-sensitive screens have authorization rules</li>
+<li>Recognition uncertainty is represented explicitly</li>
+<li>Object locations display observation time/context</li>
+<li>Reminder and medication flows are deterministic and auditable</li>
+<li>Final wireframes can be produced directly from this screen list</li>
+</ul>
+<h3 id="156-project-completion-checklist">15.6 Project Completion Checklist</h3>
+<ul>
+<li>Requirements baseline approved</li>
+<li>Database schema reviewed</li>
+<li>API specification finalized</li>
+<li>Patient UI implemented</li>
+<li>Caregiver UI implemented</li>
+<li>Authentication/RBAC tested</li>
+<li>Schedule/reminder/medication workflow tested</li>
+<li>Object pipeline tested</li>
+<li>Face pipeline tested</li>
+<li>RAG ingestion/retrieval tested</li>
+<li>Person-aware RAG integration tested</li>
+<li>Geofencing tested with simulated/controlled locations</li>
+<li>Notification flow tested</li>
+<li>Privacy/security controls tested</li>
+<li>Final documentation and demonstration scenarios completed</li>
+</ul>
+<hr />
+<h2 id="16-source-documents">16. Source Documents</h2>
+<p>This consolidated specification merges the following originally separate documents:</p>
+<ol>
+<li>Project Requirements Specification (PRS)</li>
+<li>Software Requirements Specification (SRS)</li>
+<li>System Design &amp; Architecture</li>
+<li>Use Case, Data &amp; Test Specification</li>
+<li>Database Design &amp; ER Model</li>
+<li>Complete API Specification</li>
+<li>UI/UX Design &amp; Screen Flow</li>
+</ol>
+</main>
+</div>
+</body></html>
