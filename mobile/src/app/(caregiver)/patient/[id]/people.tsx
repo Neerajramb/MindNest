@@ -49,7 +49,13 @@ export default function People() {
     const permission =
       source === 'camera' ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) return Alert.alert('Permission needed', 'Allow access to add a face photo.');
-    const options: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 0.7, allowsEditing: false };
+    const options: ImagePicker.ImagePickerOptions = {
+      mediaTypes: ['images'],
+      quality: 0.7,
+      allowsEditing: false,
+      // iPhone library photos are often HEIC; ask for a JPEG-compatible copy the server can read.
+      preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+    };
     const picked = source === 'camera' ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
     if (picked.canceled || !picked.assets[0]) return;
     setUploading(person.id);

@@ -39,24 +39,59 @@ type RequestOptions = { method?: string; body?: unknown; auth?: boolean; timeout
 const DEFAULT_TIMEOUT_MS = 15_000;
 let refreshInFlight: Promise<boolean> | null = null;
 
-async function rawRequest(path: string, options: RequestOptions, token?: string): Promise<Response> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+/** The parts of a fetch Response that `api()` reads, so uploads can come back from XMLHttpRequest. */
+type RawResponse = Pick<Response, 'ok' | 'status' | 'json'>;
+
+const networkError = () =>
+  new ApiError("Can't reach MindNest. Check your connection and try again.", 0, 'NETWORK_ERROR');
+const timeoutError = () =>
+  new ApiError('MindNest is taking too long to answer. Please try again.', 0, 'TIMEOUT');
+
+/**
+ * Multipart uploads go through XMLHttpRequest: Expo's global fetch (expo/fetch) rejects React Native's
+ * `{ uri, name, type }` file parts, while RN's native networking streams them straight from disk.
+ */
+function formRequest(method: string, url: string, form: FormData, headers: Record<string, string>, timeoutMs: number): Promise<RawResponse> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    for (const [key, value] of Object.entries(headers)) xhr.setRequestHeader(key, value);
+    xhr.timeout = timeoutMs;
+    xhr.onload = () => {
+      const text = xhr.responseText;
+      resolve({
+        ok: xhr.status >= 200 && xhr.status < 300,
+        status: xhr.status,
+        json: async () => JSON.parse(text),
+      });
+    };
+    xhr.onerror = () => reject(networkError());
+    xhr.ontimeout = () => reject(timeoutError());
+    xhr.send(form);
+  });
+}
+
+async function rawRequest(path: string, options: RequestOptions, token?: string): Promise<RawResponse> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...(options.body !== undefined && !isForm ? { 'Content-Type': 'application/json' } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+  if (isForm) return formRequest(options.method ?? 'POST', `${apiBaseUrl()}${path}`, options.body as FormData, headers, timeoutMs);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(`${apiBaseUrl()}${path}`, {
       method: options.method ?? 'GET',
-      headers: {
-        Accept: 'application/json',
-        ...(options.body !== undefined && !isForm ? { 'Content-Type': 'application/json' } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body:
-        options.body === undefined ? undefined : isForm ? (options.body as FormData) : JSON.stringify(options.body),
+      headers,
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal: controller.signal,
     });
   } catch {
-    throw new ApiError("Can't reach MindNest. Check your connection and try again.", 0, 'NETWORK_ERROR');
+    throw controller.signal.aborted ? timeoutError() : networkError();
   } finally {
     clearTimeout(timer);
   }
