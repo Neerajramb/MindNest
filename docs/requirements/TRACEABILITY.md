@@ -28,9 +28,9 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | FR-017 | RAG retrieves relevant memories | RAG-03, RAG-04 | memory | TC-011, AC-06 | Not started |
 | FR-018 | Person-aware retrieval | RAG-05 | memory, assistant | TC-012, AC-07 | Not started |
 | FR-019 | Grounded responses | RAG-06, RAG-07, BR-05, BR-06 | assistant | TC-013, AC-08 | Not started |
-| FR-020 | Caregiver defines safe zones | SAFE-01, CARE-04 | safety | — | Not started |
-| FR-021 | Monitor location vs geofence | SAFE-02, SAFE-03, BR-07 | safety | TC-014 | Not started |
-| FR-022 | Caregiver alert on violation | SAFE-04, SAFE-05 | safety, notifications | TC-015, AC-09 | Not started |
+| FR-020 | Caregiver defines safe zones | SAFE-01, CARE-04 | safety | — | Tested (API) |
+| FR-021 | Monitor location vs geofence | SAFE-02, SAFE-03, BR-07 | safety | TC-014 | Tested (API) |
+| FR-022 | Caregiver alert on violation | SAFE-04, SAFE-05 | safety, notifications | TC-015, AC-09 | Tested (API) |
 | FR-023 | Well-being audio | WELL-01..03 | wellbeing | — | Not started |
 | FR-024 | Activity/event logs | CARE-06 | audit | — | Not started |
 | FR-025 | Caregiver notifications for important events | CARE-03 | notifications | — | API done |
@@ -42,7 +42,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | CARE-01 | View patient status | C-02, C-03 | Not started |
 | CARE-02 | View schedule and reminder info | C-03, C-07 | API done |
 | CARE-03 | Receive configured alerts | C-11 | Not started |
-| CARE-04 | Manage geofences | C-10 | Not started |
+| CARE-04 | Manage geofences | C-10 | API done |
 | CARE-05 | Manage familiar people | C-08 | Not started |
 | CARE-06 | Review activity history | Activity log | Not started |
 
@@ -58,7 +58,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | NFR-006 | Maintainability | Module boundaries, provider interfaces, CI | In progress |
 | NFR-007 | Scalability | M:N caregivers, per-patient scoping, Postgres-ready | Not started |
 | NFR-008 | Auditability | Activity/audit log for config changes and alerts | In progress |
-| NFR-009 | Safety | "Last seen" wording, uncertainty language, no "safe" without location | Not started |
+| NFR-009 | Safety | "Last seen" wording, uncertainty language, no "safe" without location | In progress (safety status never 'safe' without fresh fix) |
 
 ## Business rules (SRS §6)
 
@@ -85,5 +85,5 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | AC-06 | RAG | C | Not started |
 | AC-07 | Person-aware RAG | C | Not started |
 | AC-08 | Assistant (structured, no hallucination) | D | Not started |
-| AC-09 | Geofence alert | E | Not started |
+| AC-09 | Geofence alert | E | Tested (API, simulated locations) |
 | AC-10 | Privacy (no cross-patient access) | — | Tested (API, IDOR matrix) |

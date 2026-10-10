@@ -60,6 +60,7 @@ LOCAL_APPS = [
     "scheduling",
     "reminders",
     "notifications",
+    "safety",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 

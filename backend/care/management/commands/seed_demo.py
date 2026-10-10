@@ -17,6 +17,7 @@ from django.utils import timezone
 from accounts.models import Role, User
 from care.models import Caregiver, CaregiverPatient, EmergencyContact, Patient, PermissionLevel
 from reminders.service import materialize_for_patient
+from safety.models import Geofence
 from scheduling.models import Appointment, Medication, MedicationSchedule, Routine
 
 DEMO_PASSWORD_ENV = "MINDNEST_DEMO_PASSWORD"  # noqa: S105 - env var name, not a secret
@@ -53,6 +54,12 @@ class Command(BaseCommand):
         )
 
         self._schedule(patient, caregiver_user)
+        # Fictional home in Thiruvananthapuram; move it in the caregiver app to test with real GPS.
+        Geofence.objects.get_or_create(
+            patient=patient,
+            name="Home",
+            defaults={"latitude": 8.524100, "longitude": 76.936600, "radius_m": 300, "created_by": caregiver_user},
+        )
         materialize_for_patient(patient)
 
         self.stdout.write(self.style.SUCCESS("Demo data ready (fictional):"))

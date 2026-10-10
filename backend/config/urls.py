@@ -12,6 +12,7 @@ api_v1: list[URLPattern | URLResolver] = [
     path("", include("scheduling.urls")),
     path("", include("reminders.urls")),
     path("", include("notifications.urls")),
+    path("", include("safety.urls")),
 ]
 
 urlpatterns = [
