@@ -16,13 +16,13 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Implemented end-to-end (API tested; UI not yet run on device) |
 | FR-006 | Caregiver medication records and schedules | MED-01, MED-02, MED-05 | scheduling | TC-004 | Implemented end-to-end (API tested; UI not yet run on device) |
 | FR-007 | Patient asks assistant about schedule/reminders/info | RAG-01, RAG-06 | assistant | AC-08 | Not started |
-| FR-008 | Capture camera input for object/face | OBJ-01, FACE-01 | mobile, objects_ai, people | TC-006, TC-008 | Not started |
+| FR-008 | Capture camera input for object/face | OBJ-01, FACE-01 | mobile, objects_ai, people | TC-006, TC-008 | Implemented (camera capture for face; objects next) |
 | FR-009 | Detect configured everyday objects | OBJ-02, OBJ-03 | objects_ai | TC-006 | Not started |
 | FR-010 | Store observations with time + context | OBJ-04, OBJ-05 | objects_ai | TC-006 | Not started |
 | FR-011 | Ask where an object was last detected | OBJ-06, OBJ-07, OBJ-08, BR-03 | objects_ai, assistant | TC-007, AC-04 | Not started |
-| FR-012 | Recognise registered people | FACE-02, FACE-03, FACE-04 | people | TC-008, AC-05 | Not started |
-| FR-013 | Caregiver registers familiar people | PEO-01..04 | people | — | Not started |
-| FR-014 | Unknown person reported as unknown | FACE-05, BR-02, BR-04 | people | TC-009 | Not started |
+| FR-012 | Recognise registered people | FACE-02, FACE-03, FACE-04 | people | TC-008, AC-05 | Tested (API + live real-model check); team-photo evaluation pending (KI-12) |
+| FR-013 | Caregiver registers familiar people | PEO-01..04 | people | — | Tested (API + live real-model check); team-photo evaluation pending (KI-12) |
+| FR-014 | Unknown person reported as unknown | FACE-05, BR-02, BR-04 | people | TC-009 | Tested (API + live real-model check); team-photo evaluation pending (KI-12) |
 | FR-015 | Speech to text | RAG-02 | memory (STT) | — | Not started |
 | FR-016 | Store conversations as searchable memory | — | memory | TC-010 | Not started |
 | FR-017 | RAG retrieves relevant memories | RAG-03, RAG-04 | memory | TC-011, AC-06 | Not started |
@@ -43,7 +43,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | CARE-02 | View schedule and reminder info | C-03, C-07 | Implemented (UI not yet run on device) |
 | CARE-03 | Receive configured alerts | C-11 | Not started |
 | CARE-04 | Manage geofences | C-10 | Implemented (UI not yet run on device) |
-| CARE-05 | Manage familiar people | C-08 | Not started |
+| CARE-05 | Manage familiar people | C-08 | Implemented |
 | CARE-06 | Review activity history | Activity log | Not started |
 
 ## Non-functional requirements
@@ -81,7 +81,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | AC-02 | Schedule | F | Not started |
 | AC-03 | Medication reminder | D | Tested (API) |
 | AC-04 | Object finder | A | Not started |
-| AC-05 | Face recognition | B | Not started |
+| AC-05 | Face recognition | B | Partly verified (live smoke test); formal evaluation pending (KI-12) |
 | AC-06 | RAG | C | Not started |
 | AC-07 | Person-aware RAG | C | Not started |
 | AC-08 | Assistant (structured, no hallucination) | D | Not started |

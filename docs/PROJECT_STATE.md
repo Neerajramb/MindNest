@@ -1,29 +1,28 @@
 # Project State (resume here)
 
-Last updated: 2026-10-10, end of P4 (Day 2).
+Last updated: 2026-10-10, end of P8 (Day 3).
 
 ## Where things are
 
 - Plan: 3-day MVP covering demo scenarios A–F (see `docs/adr/` and `docs/analysis/consistency-matrix.md`).
-- Phases done: **P1**, **P2 Auth/RBAC/data model**, **P3 Schedule/medication/reminders/alerts**, **P5a Safety backend**, **P4 Mobile app core**.
+- Phases done: **P1**, **P2 Auth/RBAC/data model**, **P3 Schedule/medication/reminders/alerts**, **P5a Safety backend**, **P4 Mobile app core**, **P8 Face recognition**.
 - Next phase: **Day 3: P8 Face, P7 Objects, P9/P10 Memory + Assistant, P11 Well-being, P12 QA, P13 Handover**.
 
 ## Next exact task
 
-P8 Face: backend `people` app (Person, FaceEmbedding with float32 vector), OpenCV YuNet + SFace models
-downloaded to `backend/ai_models/` (git-ignored) by a management command, enrolment endpoint (multipart image,
-consent flag, photo discarded after embedding), `/face/recognize` with a threshold and a 'not sure' answer;
-mobile C-08 People and P-04 'Who is this?' (expo-camera). `GEMINI_API_KEY` is needed from P7 onwards.
+P7 Objects: needs `GEMINI_API_KEY` in backend/.env. `objects_ai` app (Place/room, TrackedObject, ScanSession,
+ObjectObservation), Gemini vision detector behind an `ObjectDetector` interface (JSON-schema output mapped to the
+patient's tracked vocabulary), `/objects/scan` (multipart frame + place), `/objects/query`, last-seen; mobile
+P-05 Find my things and caregiver C-09 Objects + rooms.
 
-## Last gate results (P4)
+## Last gate results (P8)
 
 | Check | Result |
 |---|---|
-| Backend `pytest` | 92 passed, 92% coverage (unchanged) |
-| Mobile `tsc`, `expo lint` | Clean |
-| Mobile `jest` | 17 passed |
-| `expo export` iOS + Android | Both bundles built |
-| On-device run | Not yet done (KI-10) |
+| Backend `pytest` | 113 passed |
+| Backend `ruff`, `mypy` | Clean (105 files) |
+| Mobile `tsc`, `expo lint`, `jest` | Clean, 17 passed |
+| Live face recognition (real models) | Unknown -> not sure; enrolled -> recognised; tiny face -> guidance |
 
 Run locally: `python manage.py runserver 0.0.0.0:8000` and `python manage.py run_huey` (two terminals).
 Demo accounts (fictional): `python manage.py seed_demo` → `carol` (caregiver), `thomas` (patient).

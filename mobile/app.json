@@ -48,6 +48,21 @@
         {
           "color": "#1F5FAD"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "MindNest uses the camera to tell you who someone is and to help find your belongings. Photos are not kept.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MindNest lets caregivers choose photos of family members so they can be recognised.",
+          "cameraPermission": "MindNest uses the camera to add photos of family members."
+        }
       ]
     ],
     "experiments": {

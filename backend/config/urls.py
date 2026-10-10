@@ -13,6 +13,7 @@ api_v1: list[URLPattern | URLResolver] = [
     path("", include("reminders.urls")),
     path("", include("notifications.urls")),
     path("", include("safety.urls")),
+    path("", include("people.urls")),
 ]
 
 urlpatterns = [
