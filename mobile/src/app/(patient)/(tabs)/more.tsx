@@ -8,6 +8,7 @@ import { AppText } from '@/ui/text';
 import { colors, space } from '@/ui/theme';
 
 const ITEMS: { href: Href; icon: IconName; title: string; detail: string }[] = [
+  { href: '/find', icon: 'safety', title: 'Find my things', detail: 'Where your belongings were last seen' },
   { href: '/who-is-this', icon: 'person', title: 'Who is this?', detail: 'Recognise family and friends' },
   { href: '/medications', icon: 'medication', title: 'My medicines', detail: 'What to take and how' },
   { href: '/safety', icon: 'safety', title: 'Where am I', detail: 'Your safe places' },

@@ -144,6 +144,7 @@ export default function Home() {
       ) : null}
 
       <View style={{ gap: space.md }}>
+        <Button label="Find my things" icon="safety" onPress={() => router.push('/find')} large />
         <Button label="Who is this?" icon="person" onPress={() => router.push('/who-is-this')} large />
         <Button label="Read this to me" tone="secondary" icon="speaker" onPress={readAloud} large />
         <Button label="Help" tone="danger" icon="help" onPress={() => router.push('/help')} large />

@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from accounts.models import Role, User
 from care.models import Caregiver, CaregiverPatient, EmergencyContact, Patient, PermissionLevel
+from objects_ai.models import Place, TrackedObject
 from reminders.service import materialize_for_patient
 from safety.models import Geofence
 from scheduling.models import Appointment, Medication, MedicationSchedule, Routine
@@ -61,6 +62,17 @@ class Command(BaseCommand):
             defaults={"latitude": 8.524100, "longitude": 76.936600, "radius_m": 300, "created_by": caregiver_user},
         )
         materialize_for_patient(patient)
+        for room in ("Kitchen", "Bedroom", "Living room", "Study"):
+            Place.objects.get_or_create(patient=patient, name=room)
+        for name, aliases in (
+            ("keys", "key, car keys, house keys"),
+            ("wallet", "purse"),
+            ("glasses", "spectacles, reading glasses"),
+            ("phone", "mobile, cell phone"),
+            ("water bottle", "bottle"),
+            ("bag", "handbag, backpack"),
+        ):
+            TrackedObject.objects.get_or_create(patient=patient, name=name, defaults={"aliases": aliases})
 
         self.stdout.write(self.style.SUCCESS("Demo data ready (fictional):"))
         self.stdout.write(f"  caregiver: carol / {password}")

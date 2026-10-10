@@ -62,6 +62,7 @@ LOCAL_APPS = [
     "notifications",
     "safety",
     "people",
+    "objects_ai",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -188,7 +189,7 @@ HUEY = {
 
 # --- AI configuration (model choices live here, not in code; AI spec section 14) ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL") or "gemini-flash-lite-latest"
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")  # gemini | ollama | none
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3")
@@ -237,5 +238,7 @@ LOGGING = {
     "root": {"handlers": ["console"], "level": os.environ.get("LOG_LEVEL", "INFO")},
     "loggers": {
         "django.db.backends": {"level": "WARNING"},
+        "httpx": {"level": "WARNING"},
+        "google_genai": {"level": "WARNING"},
     },
 }

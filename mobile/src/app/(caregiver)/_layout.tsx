@@ -43,6 +43,7 @@ export default function CaregiverLayout() {
       <Stack.Screen name="patient/[id]/activity" options={{ title: 'Activity' }} />
       <Stack.Screen name="patient/[id]/contacts" options={{ title: 'Emergency contacts' }} />
       <Stack.Screen name="patient/[id]/people" options={{ title: 'Familiar people' }} />
+      <Stack.Screen name="patient/[id]/objects" options={{ title: 'Belongings & rooms' }} />
       <Stack.Screen name="patient/[id]/routine-form" options={{ title: 'Routine', presentation: 'modal' }} />
       <Stack.Screen name="patient/[id]/appointment-form" options={{ title: 'Appointment', presentation: 'modal' }} />
       <Stack.Screen name="patient/[id]/medication-form" options={{ title: 'Medication', presentation: 'modal' }} />

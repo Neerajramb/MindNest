@@ -16,10 +16,10 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Implemented end-to-end (API tested; UI not yet run on device) |
 | FR-006 | Caregiver medication records and schedules | MED-01, MED-02, MED-05 | scheduling | TC-004 | Implemented end-to-end (API tested; UI not yet run on device) |
 | FR-007 | Patient asks assistant about schedule/reminders/info | RAG-01, RAG-06 | assistant | AC-08 | Not started |
-| FR-008 | Capture camera input for object/face | OBJ-01, FACE-01 | mobile, objects_ai, people | TC-006, TC-008 | Implemented (camera capture for face; objects next) |
-| FR-009 | Detect configured everyday objects | OBJ-02, OBJ-03 | objects_ai | TC-006 | Not started |
-| FR-010 | Store observations with time + context | OBJ-04, OBJ-05 | objects_ai | TC-006 | Not started |
-| FR-011 | Ask where an object was last detected | OBJ-06, OBJ-07, OBJ-08, BR-03 | objects_ai, assistant | TC-007, AC-04 | Not started |
+| FR-008 | Capture camera input for object/face | OBJ-01, FACE-01 | mobile, objects_ai, people | TC-006, TC-008 | Implemented (camera for face and room scans) |
+| FR-009 | Detect configured everyday objects | OBJ-02, OBJ-03 | objects_ai | TC-006 | Tested (API + live Gemini check); staged-photo evaluation pending (KI-13) |
+| FR-010 | Store observations with time + context | OBJ-04, OBJ-05 | objects_ai | TC-006 | Tested (API + live Gemini check); staged-photo evaluation pending (KI-13) |
+| FR-011 | Ask where an object was last detected | OBJ-06, OBJ-07, OBJ-08, BR-03 | objects_ai, assistant | TC-007, AC-04 | Tested (API + live Gemini check); staged-photo evaluation pending (KI-13) |
 | FR-012 | Recognise registered people | FACE-02, FACE-03, FACE-04 | people | TC-008, AC-05 | Tested (API + live real-model check); team-photo evaluation pending (KI-12) |
 | FR-013 | Caregiver registers familiar people | PEO-01..04 | people | — | Tested (API + live real-model check); team-photo evaluation pending (KI-12) |
 | FR-014 | Unknown person reported as unknown | FACE-05, BR-02, BR-04 | people | TC-009 | Tested (API + live real-model check); team-photo evaluation pending (KI-12) |
@@ -80,7 +80,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | AC-01 | Authentication | — | Tested (API) |
 | AC-02 | Schedule | F | Not started |
 | AC-03 | Medication reminder | D | Tested (API) |
-| AC-04 | Object finder | A | Not started |
+| AC-04 | Object finder | A | Tested (API); live positive detection pending (KI-13) |
 | AC-05 | Face recognition | B | Partly verified (live smoke test); formal evaluation pending (KI-12) |
 | AC-06 | RAG | C | Not started |
 | AC-07 | Person-aware RAG | C | Not started |
