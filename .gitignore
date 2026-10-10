@@ -99,3 +99,10 @@ uploads/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---------- MindNest backend runtime ----------
+huey.sqlite3*
+db.sqlite3-wal
+db.sqlite3-shm
+backend/ai_models/
+backend/media/

@@ -37,9 +37,14 @@ dosage, and never claims an identity or location it is not confident about.
 
 ## Tech overview
 
-- **Mobile app** (patient) and **caregiver dashboard**
-- **Backend:** Django + REST API, authentication and role-based access control
-- **AI services:** OpenCV / computer vision, face recognition, STT, embeddings + vector store, LLM/RAG
+- **Mobile app** (`mobile/`): one Expo / React Native app with separate patient and caregiver experiences
+- **Backend** (`backend/`): Django + Django REST Framework, JWT authentication, role-based access control
+- **AI**: local face recognition (OpenCV YuNet + SFace) and text embeddings; Gemini for assistant responses,
+  room-scan object detection and speech-to-text (demo data only, see [docs/AI_USAGE.md](docs/AI_USAGE.md))
+
+## Getting started
+
+See [docs/SETUP.md](docs/SETUP.md).
 
 ## Documentation
 
@@ -49,3 +54,10 @@ dosage, and never claims an identity or location it is not confident about.
 | Requirements, design, database, API, UI/UX, AI/RAG specs | [docs/specs/](docs/specs/) |
 | Project milestones | [docs/Project_Milestones.html](docs/Project_Milestones.html) |
 | UI wireframes | [docs/wireframes/](docs/wireframes/) |
+| Setup guide | [docs/SETUP.md](docs/SETUP.md) |
+| Architecture decisions | [docs/adr/](docs/adr/) |
+| Spec consistency analysis | [docs/analysis/consistency-matrix.md](docs/analysis/consistency-matrix.md) |
+| Requirements traceability | [docs/requirements/TRACEABILITY.md](docs/requirements/TRACEABILITY.md) |
+| Current project state | [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) |
+| Known issues | [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) |
+| Phase reports | [docs/phase-reports/](docs/phase-reports/) |
