@@ -1,29 +1,30 @@
 # Project State (resume here)
 
-Last updated: 2026-10-10, end of P1.
+Last updated: 2026-10-10, end of P2.
 
 ## Where things are
 
 - Plan: 3-day MVP covering demo scenarios A–F (see `docs/adr/` and `docs/analysis/consistency-matrix.md`).
-- Phases done: **P1 Foundation**.
-- Next phase: **P2 Auth, RBAC and data model (Milestones 1+2)**.
+- Phases done: **P1 Foundation**, **P2 Auth/RBAC/data model**.
+- Next phase: **P3 Schedule, medication, reminders, notifications (Milestone 3)**.
 
 ## Next exact task
 
-Create Django apps `accounts` (custom User with role), `care` (Patient, Caregiver, CaregiverPatient,
-LinkCode, EmergencyContact, PatientSettings), and `audit` (ActivityLog). Then `core/scope.py` (`patient_scope`),
-the auth endpoints (register, login, refresh, logout, me, link codes), and the IDOR test matrix.
-The custom user model must exist before the first `migrate`.
+Create apps `scheduling` (DailySchedule routine, Appointment, Medication, MedicationSchedule with RRULE),
+`reminders` (Reminder occurrence: PENDING/SENT/ACKNOWLEDGED/SNOOZED/MISSED, unique per source+time) and
+`notifications` (Device, Notification outbox). Then the Huey tasks: materialise 48 h, mark missed + caregiver alert.
+Use `core.scope.resolve_patient`/`resolve_owned` and `core.permissions.user_of` in every view.
 
-## Last gate results (P1)
+## Last gate results (P2)
 
 | Check | Result |
 |---|---|
-| Backend `pytest` | 4 passed |
-| Backend `ruff check`, `ruff format --check` | Clean |
-| Backend `mypy` | No issues (16 files) |
-| Mobile `tsc --noEmit` | Clean |
-| Mobile `jest` | 1 passed |
+| Backend `pytest` | 43 passed, 92% coverage |
+| Backend `ruff`, `mypy` | Clean (49 files) |
+| Clean migrate + seed + login smoke test | Passed |
+| Mobile `tsc`, `jest` | Clean, 1 passed (unchanged since P1) |
+
+Demo accounts (fictional, local only): `python manage.py seed_demo` creates `carol` (caregiver) and `thomas` (patient).
 
 ## Blockers / needed from the project owner
 

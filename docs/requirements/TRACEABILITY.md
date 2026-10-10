@@ -9,8 +9,8 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 
 | ID | Requirement (short) | SRS detail | Module | Tests | Status |
 |---|---|---|---|---|---|
-| FR-001 | Authenticate patients and caregivers | AUTH-01, AUTH-03 | accounts | TC-001, TC-002 | Not started |
-| FR-002 | Separate patient/caregiver privileges | AUTH-02, AUTH-04, BR-01 | accounts, care, core.scope | TC-003, TC-016 | Not started |
+| FR-001 | Authenticate patients and caregivers | AUTH-01, AUTH-03 | accounts | TC-001, TC-002 | Tested (API) |
+| FR-002 | Separate patient/caregiver privileges | AUTH-02, AUTH-04, BR-01 | accounts, care, core.scope | TC-003, TC-016 | Tested (API) |
 | FR-003 | Patient views daily schedule | SCH-02 | scheduling | AC-02 | Not started |
 | FR-004 | Caregiver CRUD schedule items | SCH-01, SCH-03 | scheduling | AC-02 | Not started |
 | FR-005 | Reminders for activities, appointments, medications | SCH-04, MED-03 | reminders | TC-005, AC-03 | Not started |
@@ -51,13 +51,13 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | ID | Requirement | How it is verified | Status |
 |---|---|---|---|
 | NFR-001 | Privacy (minimise sensitive data) | No raw media retained; retention purge tests; Gemini synthetic-data rule | Not started |
-| NFR-002 | Security | IDOR matrix, auth tests, throttling, /security-review | Not started |
+| NFR-002 | Security | IDOR matrix, auth tests, throttling, /security-review | In progress |
 | NFR-003 | Usability | Accessible tokens, large targets, icon + text, screen reader labels | Not started |
 | NFR-004 | Performance | Latency measured and recorded in P12 | Not started |
 | NFR-005 | Reliability | TC-017 (LLM down → structured features keep working) | Not started |
 | NFR-006 | Maintainability | Module boundaries, provider interfaces, CI | In progress |
 | NFR-007 | Scalability | M:N caregivers, per-patient scoping, Postgres-ready | Not started |
-| NFR-008 | Auditability | Activity/audit log for config changes and alerts | Not started |
+| NFR-008 | Auditability | Activity/audit log for config changes and alerts | In progress |
 | NFR-009 | Safety | "Last seen" wording, uncertainty language, no "safe" without location | Not started |
 
 ## Business rules (SRS §6)
@@ -77,7 +77,7 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 
 | AC | Area | Demo scenario | Status |
 |---|---|---|---|
-| AC-01 | Authentication | — | Not started |
+| AC-01 | Authentication | — | Tested (API) |
 | AC-02 | Schedule | F | Not started |
 | AC-03 | Medication reminder | D | Not started |
 | AC-04 | Object finder | A | Not started |
@@ -86,4 +86,4 @@ Status values: Not started · In progress · Implemented · Tested · Verified (
 | AC-07 | Person-aware RAG | C | Not started |
 | AC-08 | Assistant (structured, no hallucination) | D | Not started |
 | AC-09 | Geofence alert | E | Not started |
-| AC-10 | Privacy (no cross-patient access) | — | Not started |
+| AC-10 | Privacy (no cross-patient access) | — | Tested (API, IDOR matrix) |

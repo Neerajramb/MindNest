@@ -14,6 +14,7 @@ ignore = ["RUF012"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101", "S105", "S106"]
+"conftest.py" = ["S105"]
 "config/settings.py" = ["S105"]
 
 [tool.mypy]

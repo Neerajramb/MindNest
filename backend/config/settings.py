@@ -54,6 +54,9 @@ THIRD_PARTY_APPS = [
 ]
 LOCAL_APPS = [
     "core",
+    "accounts",
+    "care",
+    "audit",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -88,11 +91,12 @@ TEMPLATES = [
 
 DATABASES = {
     "default": dj_database_url.parse(
-        os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        os.environ.get("DATABASE_URL") or f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=60,
     )
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "accounts.User"
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
