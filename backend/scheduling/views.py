@@ -11,11 +11,14 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import Role
 from audit.models import LogCategory
 from audit.service import log_event
 from care.models import Patient
 from core.permissions import IsCaregiver, IsPatientOrCaregiver, user_of
 from core.scope import resolve_owned, resolve_patient
+from notifications.models import AlertType, Severity
+from notifications.service import create_alert
 from reminders.service import refresh_source
 from scheduling.agenda import build_agenda
 from scheduling.models import Appointment, Medication, MedicationSchedule, Routine
@@ -29,6 +32,19 @@ from scheduling.serializers import (
 
 def _audit(request: Request, event: str, patient: Patient, **data: object) -> None:
     log_event(event, actor=user_of(request), patient=patient, category=LogCategory.AUDIT, **data)
+
+
+def describe_routine(routine: Routine) -> str:
+    """'Go to the park at 4:00 pm on Sun 11 Oct' or '... every day', for caregiver alerts."""
+    hour = routine.scheduled_time.hour % 12 or 12
+    clock = f"{hour}:{routine.scheduled_time:%M} {'pm' if routine.scheduled_time.hour >= 12 else 'am'}"
+    if routine.end_date == routine.start_date:
+        when = f"on {routine.start_date:%a} {routine.start_date.day} {routine.start_date:%b}"
+    elif routine.recurrence_rule == "FREQ=DAILY":
+        when = "every day"
+    else:
+        when = "repeating"
+    return f"{routine.title} at {clock} {when}"
 
 
 # ---------- Routines (daily schedule) ----------
@@ -45,12 +61,24 @@ class RoutineListView(APIView):
 
     @extend_schema(request=RoutineSerializer, responses={201: RoutineSerializer})
     def post(self, request: Request, patient_id: UUID) -> Response:
-        patient = resolve_patient(user_of(request), patient_id, write=True)
+        """Caregivers (editor or above) add routines; patients may add their own, and their caregivers are told."""
+        user = user_of(request)
+        by_patient = user.role == Role.PATIENT
+        patient = resolve_patient(user, patient_id, write=not by_patient)
         serializer = RoutineSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        routine = serializer.save(patient=patient, created_by=user_of(request))
+        routine = serializer.save(patient=patient, created_by=user)
         refresh_source(patient, routine.id)
         _audit(request, "routine.created", patient, routine_id=str(routine.id))
+        if by_patient:
+            create_alert(
+                patient,
+                AlertType.PATIENT_REMINDER,
+                Severity.INFO,
+                f"{patient.preferred_name or patient.display_name} added a reminder: {describe_routine(routine)}.",
+                data={"routine_id": str(routine.id)},
+                actor=user,
+            )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

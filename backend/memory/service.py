@@ -21,7 +21,7 @@ PERSON_BOOST = 0.10  # RAG-05: prefer memories with the recognised person, witho
 TOP_K = 4
 
 
-def _label(speaker: str, person: Person | None) -> str:
+def speaker_label(speaker: str, person: Person | None) -> str:
     if speaker == "PATIENT":
         return "You"
     return person.name if person else "Someone"
@@ -32,7 +32,7 @@ def chunk(segments: list[Segment], person: Person | None) -> list[str]:
     chunks: list[str] = []
     current = ""
     for seg in segments:
-        line = f"{_label(seg.speaker, person)}: {seg.text}"
+        line = f"{speaker_label(seg.speaker, person)}: {seg.text}"
         if current and len(current) + len(line) + 1 > CHUNK_CHARS:
             chunks.append(current)
             current = line

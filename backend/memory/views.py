@@ -22,6 +22,7 @@ from core.permissions import IsPatient, IsPatientOrCaregiver, user_of
 from core.request_data import field
 from core.scope import own_patient, resolve_patient
 from memory.models import Conversation, ConversationSource, Retention
+from memory.plans import suggest_reminders
 from memory.service import ingest, retire, search, text_note_segments
 from people.models import Person
 
@@ -96,7 +97,9 @@ class RecordConversationView(APIView):
         conversation = ingest(
             get_embedder(), patient, segments, source=ConversationSource.VOICE, person=person, user=user
         )
-        return Response(conversation_summary(conversation, include_text=True), status=status.HTTP_201_CREATED)
+        data = conversation_summary(conversation, include_text=True)
+        data["suggested_reminders"] = suggest_reminders(patient, segments, person)
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=["memory"])
@@ -120,7 +123,9 @@ class NoteView(APIView):
         conversation = ingest(
             get_embedder(), patient, segments, source=ConversationSource.TEXT, person=person, user=user
         )
-        return Response(conversation_summary(conversation, include_text=True), status=status.HTTP_201_CREATED)
+        data = conversation_summary(conversation, include_text=True)
+        data["suggested_reminders"] = suggest_reminders(patient, segments, person)
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=["memory"])

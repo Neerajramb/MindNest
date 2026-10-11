@@ -21,6 +21,11 @@ export type ConversationSummary = {
   messages?: { speaker: 'PATIENT' | 'PERSON' | 'SYSTEM'; text: string }[];
 };
 
+/** A plan with a clock time heard in a just-saved conversation; the patient decides whether to add it. */
+export type SuggestedReminder = { title: string; date: string; time: string };
+
+export type SavedConversation = ConversationSummary & { suggested_reminders: SuggestedReminder[] };
+
 export type PersonLite = { id: string; name: string; relationship: string };
 
 export const askAssistant = (query: string, sessionId?: string, contextPersonId?: string) =>

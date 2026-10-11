@@ -76,7 +76,8 @@ def test_invalid_schedule_input_is_rejected(world: dict[str, Any]) -> None:
 def test_schedule_write_access_control(world: dict[str, Any], make_caregiver) -> None:
     pid = world["pat"].id
     payload = {"title": "Walk", "scheduled_time": "08:00"}
-    assert world["pat_client"].post(f"/api/v1/patients/{pid}/schedule", payload).status_code == 403
+    # Patients may add their own reminders (covered below); medications stay caregiver-only.
+    assert world["pat_client"].post(f"/api/v1/patients/{pid}/medications", {"name": "X"}).status_code == 403
     assert world["dave_client"].post(f"/api/v1/patients/{pid}/schedule", payload).status_code == 404
     assert world["dave_client"].get(f"/api/v1/patients/{pid}/medications").status_code == 404
     viewer = make_caregiver("vera")
@@ -151,3 +152,42 @@ def test_appointment_reminder_fires_before_start_and_is_removed_on_delete(world:
     assert reminder.scheduled_at == start.replace(microsecond=reminder.scheduled_at.microsecond) - timedelta(hours=1)
     assert world["carol_client"].delete(f"/api/v1/appointments/{appt['id']}").status_code == 204
     assert not Reminder.objects.filter(type=ReminderType.APPOINTMENT).exists()
+
+
+def test_patient_adds_own_one_off_reminder_and_caregivers_are_alerted(world: dict[str, Any]) -> None:
+    from notifications.models import Alert, AlertType, Notification
+
+    pid = world["pat"].id
+    today = timezone.now().astimezone(IST).date()
+    created = world["pat_client"].post(
+        f"/api/v1/patients/{pid}/schedule",
+        {"title": "Go to the park", "scheduled_time": _soon_local(), "start_date": today, "end_date": today},
+    )
+    assert created.status_code == 201
+    assert Reminder.objects.filter(patient=world["pat"], message="Go to the park").count() == 1
+
+    alert = Alert.objects.get(patient=world["pat"])
+    assert alert.type == AlertType.PATIENT_REMINDER
+    assert alert.message.startswith("Pat Patient added a reminder: Go to the park at ")
+    assert alert.message.endswith(f"on {today:%a} {today.day} {today:%b}.")
+    assert Notification.objects.filter(recipient=world["carol"], alert=alert).exists()
+
+    # Patients can add, but changing or removing schedule items stays with caregivers.
+    routine_id = created.json()["data"]["id"]
+    assert world["pat_client"].patch(f"/api/v1/schedule/{routine_id}", {"title": "X"}).status_code == 403
+    # And never for another patient.
+    assert (
+        world["other_client"]
+        .post(f"/api/v1/patients/{pid}/schedule", {"title": "X", "scheduled_time": "10:00"})
+        .status_code
+        == 404
+    )
+
+
+def test_caregiver_routine_does_not_raise_an_alert(world: dict[str, Any]) -> None:
+    from notifications.models import Alert
+
+    world["carol_client"].post(
+        f"/api/v1/patients/{world['pat'].id}/schedule", {"title": "Lunch", "scheduled_time": "13:00"}
+    )
+    assert not Alert.objects.exists()

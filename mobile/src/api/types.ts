@@ -109,7 +109,7 @@ export type Medication = {
   schedules: MedicationSchedule[];
 };
 
-export type AlertType = 'GEOFENCE' | 'MEDICATION' | 'SOS' | 'LOCATION_UNAVAILABLE' | 'SYSTEM' | 'OTHER';
+export type AlertType = 'GEOFENCE' | 'MEDICATION' | 'SOS' | 'LOCATION_UNAVAILABLE' | 'PATIENT_REMINDER' | 'SYSTEM' | 'OTHER';
 
 export type AlertItem = {
   id: string;

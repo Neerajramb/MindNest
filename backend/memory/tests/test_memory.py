@@ -181,3 +181,38 @@ def test_caregiver_sees_only_what_patient_allows(
 def test_person_from_another_patient_is_rejected(world: dict[str, Any]) -> None:
     stranger = Person.objects.create(patient=world["other"], name="Stranger", consent_confirmed=True)
     assert _note(world, "hello", person_id=str(stranger.id)).status_code == 404
+
+
+def test_note_suggests_future_plans_as_reminders(world: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
+
+    tz = ZoneInfo("Asia/Kolkata")
+    now = datetime.now(tz)
+    later = now + timedelta(hours=2)
+    prompts: list[str] = []
+
+    def fake_llm(system: str, prompt: str, schema: dict[str, Any]) -> dict[str, Any]:
+        prompts.append(prompt)
+        plan = {"title": "Go to the park", "date": later.date().isoformat(), "time": f"{later:%H:%M}"}
+        past = {
+            "title": "Breakfast",
+            "date": (now - timedelta(hours=3)).date().isoformat(),
+            "time": f"{now - timedelta(hours=3):%H:%M}",
+        }
+        return {"plans": [plan, plan, past, {"title": "Bad", "date": "soon", "time": "4pm"}, "junk"]}
+
+    monkeypatch.setattr("memory.plans.generate_json", fake_llm)
+    response = _note(world, "We are going to the park later")
+    assert response.status_code == 201
+    assert response.json()["data"]["suggested_reminders"] == [
+        {"title": "Go to the park", "date": later.date().isoformat(), "time": f"{later:%H:%M}"}
+    ]
+    assert "You: We are going to the park later" in prompts[0]
+    assert f"{now:%d %B %Y}" in prompts[0]
+
+
+def test_note_still_saves_when_plan_extraction_is_unavailable(world: dict[str, Any]) -> None:
+    response = _note(world, "We are going to the park at 4pm")
+    assert response.status_code == 201
+    assert response.json()["data"]["suggested_reminders"] == []

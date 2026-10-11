@@ -1,4 +1,3 @@
-import { Host } from '@expo/ui';
 import { DateTimePicker } from '@expo/ui/community/datetime-picker';
 import { View } from 'react-native';
 
@@ -24,18 +23,19 @@ export function PickerField({
   return (
     <View style={{ gap: space.xs }}>
       <AppText variant="bodyStrong">{label}</AppText>
-      <Host matchContents>
-        <DateTimePicker
-          value={value}
-          mode={mode}
-          display="compact"
-          presentation="inline"
-          accentColor={colors.primary}
-          timeZoneName={timeZone}
-          minimumDate={minimumDate}
-          onValueChange={(_, date) => onChange(date)}
-        />
-      </Host>
+      {/* The picker brings its own native Host. Wrapping it in a second, content-sized Host left it with no
+          width, so only a grey sliver (".00") showed at the far left. */}
+      <DateTimePicker
+        value={value}
+        mode={mode}
+        display="compact"
+        presentation="inline"
+        accentColor={colors.primary}
+        timeZoneName={timeZone}
+        minimumDate={minimumDate}
+        onValueChange={(_, date) => onChange(date)}
+        style={{ alignSelf: 'stretch' }}
+      />
     </View>
   );
 }

@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { Alert, Switch, View } from 'react-native';
 
 import { api, errorMessage } from '@/api/client';
-import { useConversations, usePeopleList } from '@/api/assistant';
-import { useMyPatient } from '@/api/hooks';
+import { useConversations, usePeopleList, type SavedConversation, type SuggestedReminder } from '@/api/assistant';
+import { useAddMyReminder, useMyPatient } from '@/api/hooks';
 import { usePatientId } from '@/features/patient-context';
 import { uploadAudio, useVoiceRecorder } from '@/features/voice-recorder';
-import { formatDateTime } from '@/lib/time';
+import { addDays, formatClock, formatDateTime, formatDay, isoDateIn } from '@/lib/time';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { TextField } from '@/ui/form';
@@ -29,6 +29,8 @@ export default function Memory() {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ text: string; tone: 'success' | 'danger' } | null>(null);
+  const [suggestions, setSuggestions] = useState<SuggestedReminder[]>([]);
+  const addReminder = useAddMyReminder(patientId);
   const extra = (): Record<string, string> => ({
     consent_confirmed: 'true',
     ...(personId !== 'none' ? { person_id: personId } : {}),
@@ -38,7 +40,8 @@ export default function Memory() {
   const saveRecording = async (uri: string) => {
     setBusy(true);
     try {
-      await uploadAudio('/conversations/record', uri, extra());
+      const saved = await uploadAudio<SavedConversation>('/conversations/record', uri, extra());
+      setSuggestions(saved.suggested_reminders ?? []);
       setMessage({ text: 'Saved. You can ask me about it later.', tone: 'success' });
       setConsent(false);
       refresh();
@@ -53,6 +56,7 @@ export default function Memory() {
 
   const toggleRecording = async () => {
     setMessage(null);
+    setSuggestions([]);
     if (!recorder.recording) {
       if (!consent) return setMessage({ text: 'First confirm that everyone agreed to be recorded.', tone: 'danger' });
       if (!(await recorder.start())) setMessage({ text: 'MindNest needs the microphone. You can type a note instead.', tone: 'danger' });
@@ -66,8 +70,10 @@ export default function Memory() {
     if (!note.trim()) return;
     setBusy(true);
     setMessage(null);
+    setSuggestions([]);
     try {
-      await api('/conversations/note', { method: 'POST', body: { text: note.trim(), ...extra() } });
+      const saved = await api<SavedConversation>('/conversations/note', { method: 'POST', body: { text: note.trim(), ...extra() } });
+      setSuggestions(saved.suggested_reminders ?? []);
       setNote('');
       setMessage({ text: 'Saved.', tone: 'success' });
       refresh();
@@ -77,6 +83,19 @@ export default function Memory() {
       setBusy(false);
     }
   };
+
+  const today = isoDateIn(tz);
+  const dayLabel = (date: string) =>
+    date === today ? 'Today' : date === addDays(today, 1) ? 'Tomorrow' : formatDay(`${date}T12:00:00Z`);
+  const drop = (plan: SuggestedReminder) => setSuggestions((list) => list.filter((p) => p !== plan));
+  const accept = (plan: SuggestedReminder) =>
+    addReminder
+      .mutateAsync(plan)
+      .then(() => {
+        drop(plan);
+        setMessage({ text: `Reminder added: ${plan.title}. Your caregiver can see it too.`, tone: 'success' });
+      })
+      .catch((e) => Alert.alert('Could not add the reminder', errorMessage(e)));
 
   const remove = (id: string) =>
     Alert.alert('Delete this memory?', 'It will be removed for good, and I will no longer be able to remind you of it.', [
@@ -125,6 +144,30 @@ export default function Memory() {
           Recordings are turned into text by an online service and the audio is then deleted.
         </AppText>
       </Card>
+
+      {suggestions.length ? (
+        <Card tint={colors.primarySoft}>
+          <AppText variant="title">I heard a plan</AppText>
+          <AppText>Would you like a reminder?</AppText>
+          {suggestions.map((plan) => (
+            <View key={`${plan.title}-${plan.date}-${plan.time}`} style={{ gap: space.sm }}>
+              <AppText variant="bodyStrong">
+                {plan.title} · {dayLabel(plan.date)} at {formatClock(plan.time)}
+              </AppText>
+              <View style={{ flexDirection: 'row', gap: space.sm }}>
+                <Button
+                  label="Add reminder"
+                  icon="add"
+                  onPress={() => void accept(plan)}
+                  loading={addReminder.isPending && addReminder.variables === plan}
+                  style={{ flex: 1 }}
+                />
+                <Button label="No thanks" tone="ghost" onPress={() => drop(plan)} style={{ flex: 1 }} />
+              </View>
+            </View>
+          ))}
+        </Card>
+      ) : null}
 
       <AppText variant="title">My memories</AppText>
       {conversations.isLoading ? <LoadingState /> : null}

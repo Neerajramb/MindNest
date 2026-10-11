@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { Alert, View } from 'react-native';
 
@@ -6,6 +7,7 @@ import { useAcknowledgeReminder, useMyPatient, useReminders, useSnoozeReminder }
 import type { Reminder } from '@/api/types';
 import { ReminderCard, displayState, type DisplayState } from '@/components/reminder-card';
 import { usePatientId } from '@/features/patient-context';
+import { Button } from '@/ui/button';
 import { Screen } from '@/ui/screen';
 import { EmptyState, ErrorState, InlineNotice, LoadingState } from '@/ui/states';
 import { AppText } from '@/ui/text';
@@ -20,6 +22,7 @@ const SECTIONS: { key: DisplayState[]; title: string }[] = [
 
 /** P-08 Reminders and P-09 Reminder detail (actions live on each card). */
 export default function Reminders() {
+  const router = useRouter();
   const patientId = usePatientId();
   const tz = useMyPatient().data?.timezone;
   const reminders = useReminders(patientId);
@@ -41,13 +44,14 @@ export default function Reminders() {
 
   return (
     <Screen refreshing={reminders.isRefetching} onRefresh={() => void reminders.refetch()}>
+      <Button label="Add a reminder" icon="add" tone="secondary" onPress={() => router.push('/add-reminder')} large />
       {reminders.isLoading ? <LoadingState /> : null}
       {reminders.error && !reminders.data ? (
         <ErrorState message={errorMessage(reminders.error)} onRetry={() => void reminders.refetch()} />
       ) : null}
       {reminders.error && reminders.data ? <InlineNotice message="Could not refresh. Showing saved reminders." /> : null}
       {reminders.data && reminders.data.length === 0 ? (
-        <EmptyState icon="reminders" title="No reminders" message="Reminders from your caregiver will show up here." />
+        <EmptyState icon="reminders" title="No reminders" message="Reminders from your caregiver, and ones you add, will show up here." />
       ) : null}
       {SECTIONS.map(({ key, title }) => {
         const list = key.flatMap((k) => grouped.get(k) ?? []);

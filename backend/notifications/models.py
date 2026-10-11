@@ -9,6 +9,7 @@ class AlertType(models.TextChoices):
     MEDICATION = "MEDICATION", "Missed medication"
     SOS = "SOS", "Help requested"
     LOCATION_UNAVAILABLE = "LOCATION_UNAVAILABLE", "Location unavailable"
+    PATIENT_REMINDER = "PATIENT_REMINDER", "Added a reminder"
     SYSTEM = "SYSTEM", "System"
     OTHER = "OTHER", "Other"
 

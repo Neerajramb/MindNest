@@ -161,3 +161,19 @@ export function useAcknowledgeAlert() {
     },
   });
 }
+
+/** A reminder the patient adds for themselves: one day (`date`, local YYYY-MM-DD) or every day from it. */
+export type NewReminder = { title: string; date: string; time: string; daily?: boolean };
+
+/** Patients add reminders as routines; the server tells their caregivers. */
+export function useAddMyReminder(patientId: string | undefined) {
+  const invalidate = useInvalidatePatient();
+  return useMutation({
+    mutationFn: ({ title, date, time, daily }: NewReminder) =>
+      api<Routine>(`/patients/${patientId}/schedule`, {
+        method: 'POST',
+        body: { title, scheduled_time: time, start_date: date, end_date: daily ? null : date, recurrence_rule: 'FREQ=DAILY' },
+      }),
+    onSuccess: () => patientId && invalidate(patientId),
+  });
+}

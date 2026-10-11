@@ -13,6 +13,7 @@ const typeLook: Record<AlertType, { label: string; icon: IconName }> = {
   MEDICATION: { label: 'Missed medication', icon: 'medication' },
   SOS: { label: 'Asked for help', icon: 'help' },
   LOCATION_UNAVAILABLE: { label: 'Location unavailable', icon: 'offline' },
+  PATIENT_REMINDER: { label: 'Added a reminder', icon: 'reminders' },
   SYSTEM: { label: 'System', icon: 'alert' },
   OTHER: { label: 'Alert', icon: 'alert' },
 };
