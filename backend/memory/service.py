@@ -43,6 +43,46 @@ def chunk(segments: list[Segment], person: Person | None) -> list[str]:
     return chunks
 
 
+def _store_segments(
+    embedder: Embedder,
+    conversation: Conversation,
+    segments: list[Segment],
+    *,
+    person: Person | None,
+    first_position: int,
+    event_time: datetime,
+) -> int:
+    """Save the turns and their searchable chunks; returns how many chunks were stored."""
+    ConversationMessage.objects.bulk_create(
+        [
+            ConversationMessage(
+                conversation=conversation,
+                speaker_type=Speaker.PATIENT if s.speaker == "PATIENT" else Speaker.PERSON,
+                content=s.text,
+                position=first_position + i,
+            )
+            for i, s in enumerate(segments)
+        ]
+    )
+    texts = chunk(segments, person)
+    if texts:
+        vectors = embedder.embed(texts)
+        Memory.objects.bulk_create(
+            [
+                Memory(
+                    patient=conversation.patient,
+                    conversation=conversation,
+                    recognized_person=person,
+                    content=text,
+                    vector=vector.astype(np.float32).tobytes(),
+                    event_time=event_time,
+                )
+                for text, vector in zip(texts, vectors, strict=True)
+            ]
+        )
+    return len(texts)
+
+
 @transaction.atomic
 def ingest(
     embedder: Embedder,
@@ -64,40 +104,44 @@ def ingest(
         consent_confirmed=True,
         created_by=user,
     )
-    ConversationMessage.objects.bulk_create(
-        [
-            ConversationMessage(
-                conversation=conversation,
-                speaker_type=Speaker.PATIENT if s.speaker == "PATIENT" else Speaker.PERSON,
-                content=s.text,
-                position=i,
-            )
-            for i, s in enumerate(segments)
-        ]
-    )
-    texts = chunk(segments, person)
-    if texts:
-        vectors = embedder.embed(texts)
-        Memory.objects.bulk_create(
-            [
-                Memory(
-                    patient=patient,
-                    conversation=conversation,
-                    recognized_person=person,
-                    content=text,
-                    vector=vector.astype(np.float32).tobytes(),
-                    event_time=started_at,
-                )
-                for text, vector in zip(texts, vectors, strict=True)
-            ]
-        )
+    chunks = _store_segments(embedder, conversation, segments, person=person, first_position=0, event_time=started_at)
     log_event(
         "memory.saved",
         actor=user,
         patient=patient,
         source=source,
         person=person.name if person else None,
-        chunks=len(texts),
+        chunks=chunks,
+    )
+    return conversation
+
+
+@transaction.atomic
+def append(
+    embedder: Embedder, conversation: Conversation, segments: list[Segment], *, person: Person | None, user: User
+) -> Conversation:
+    """Add the next part of an ongoing recorded conversation (AR Vision saves one conversation in short parts)."""
+    now = timezone.now()
+    chunks = _store_segments(
+        embedder,
+        conversation,
+        segments,
+        person=person,
+        first_position=conversation.messages.count(),
+        event_time=now,
+    )
+    conversation.ended_at = now
+    if person is not None and conversation.recognized_person_id is None:
+        conversation.recognized_person = person
+    conversation.save(update_fields=["ended_at", "recognized_person"])
+    log_event(
+        "memory.saved",
+        actor=user,
+        patient=conversation.patient,
+        source=conversation.source,
+        person=person.name if person else None,
+        chunks=chunks,
+        appended=True,
     )
     return conversation
 
@@ -144,4 +188,4 @@ def retire(conversation: Conversation, user: User) -> None:
     log_event("memory.deleted", actor=user, patient=conversation.patient)
 
 
-__all__ = ["ConversationSource", "Hit", "chunk", "ingest", "retire", "search", "text_note_segments"]
+__all__ = ["ConversationSource", "Hit", "append", "chunk", "ingest", "retire", "search", "text_note_segments"]

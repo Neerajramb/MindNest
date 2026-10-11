@@ -16,3 +16,4 @@ Approved decisions sit at the top of the source-of-truth hierarchy (see `docs/an
 | [0008](0008-notifications.md) | Local scheduled reminders + polled caregiver alerts | Accepted (temporary) |
 | [0009](0009-hosting.md) | Laptop hosting now, VM-ready deploy later | Accepted |
 | [0010](0010-auth-and-pairing.md) | JWT auth and caregiver-issued link codes | Accepted |
+| [0011](0011-wake-word.md) | "MindNest" wake word via on-device speech recognition (development build) | Accepted |

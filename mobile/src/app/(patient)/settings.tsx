@@ -6,6 +6,7 @@ import { api, errorMessage } from '@/api/client';
 import { qk, useMyPatient } from '@/api/hooks';
 import type { MemoryAccess, Patient } from '@/api/types';
 import { useAuth } from '@/auth/auth-context';
+import { useWakeWord } from '@/features/wake-word';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Screen } from '@/ui/screen';
@@ -31,6 +32,7 @@ export default function Settings() {
   const client = useQueryClient();
   const { user, signOut } = useAuth();
   const me = useMyPatient();
+  const wake = useWakeWord();
   const [saving, setSaving] = useState(false);
 
   const update = async (changes: Partial<Patient>) => {
@@ -78,6 +80,25 @@ export default function Settings() {
             value={me.data.voice_responses_enabled}
             disabled={saving}
             onValueChange={(value) => void update({ voice_responses_enabled: value })}
+          />
+        </View>
+      </Card>
+
+      <Card>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+          <View style={{ flex: 1 }}>
+            <AppText variant="title">Listen for “MindNest”</AppText>
+            <AppText color={colors.textMuted}>
+              {wake.status === 'unavailable'
+                ? 'Needs the MindNest app itself; it does not work inside Expo Go.'
+                : 'While the app is open, say “MindNest” and then your question.'}
+            </AppText>
+          </View>
+          <Switch
+            accessibilityLabel="Listen for MindNest"
+            value={wake.enabled}
+            disabled={wake.status === 'unavailable'}
+            onValueChange={wake.setEnabled}
           />
         </View>
       </Card>

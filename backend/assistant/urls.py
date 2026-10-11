@@ -9,4 +9,5 @@ urlpatterns = [
     path("assistant/query", views.QueryView.as_view(), name="assistant-query"),
     path("assistant/voice-query", views.VoiceQueryView.as_view(), name="assistant-voice-query"),
     path("live/look", live.LiveLookView.as_view(), name="live-look"),
+    path("live/faces", live.LiveFacesView.as_view(), name="live-faces"),
 ]

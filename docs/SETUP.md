@@ -59,7 +59,7 @@ npm test
 3. Copy `mobile/.env.example` to `mobile/.env` and set `EXPO_PUBLIC_API_URL=http://<LAN-IP>:8000/api/v1`.
 4. In `backend/.env`, make sure `DJANGO_ALLOWED_HOSTS` includes the LAN IP (or `*` for local development).
 5. Start the backend with `python manage.py runserver 0.0.0.0:8000` and the jobs with `python manage.py run_huey`.
-6. Run `cd mobile && npm start`, then scan the QR code with the iPhone Camera app (or Expo Go on Android).
+6. Run `cd mobile && npx expo start --go`, then scan the QR code with the iPhone Camera app (or Expo Go on Android).
 7. Demo accounts after `python manage.py seed_demo`: caregiver `carol`, patient `thomas`,
    password `MindNest-Demo-2026` (fictional data).
 
@@ -68,6 +68,16 @@ The server address can also be changed on the sign-in screen ("Server address") 
 The app reads the backend URL from `EXPO_PUBLIC_API_URL` (for example `http://192.168.1.20:8000/api/v1`).
 Use your computer's LAN IP, not `localhost`, because the phone is a separate device.
 When the phone first connects, Windows may ask to allow Python through the firewall on private networks; allow it.
+
+### Run the MindNest app build (needed for the "MindNest" wake word)
+
+Expo Go cannot listen for "MindNest" (ADR-0011). Everything else still works in Expo Go.
+
+1. Build the Android development app once (and again after adding native modules):
+   `cd mobile && npx eas-cli build --profile development --platform android`. Install the APK from the link EAS prints.
+2. Start Metro for it: `npx expo start --dev-client --lan`, then open the MindNest app and pick the server, or scan the QR.
+3. Patient app → Settings → "Listen for 'MindNest'" (on by default). Allow the microphone and speech recognition.
+4. With the app open, say "MindNest, what do I have today?".
 
 ## Secrets
 

@@ -68,6 +68,7 @@ export const icons = {
   speaker: { ios: 'speaker.wave.2.fill', android: 'volume-up' },
   map: { ios: 'map.fill', android: 'map' },
   camera: { ios: 'camera.fill', android: 'photo-camera' },
+  vision: { ios: 'viewfinder', android: 'center-focus-strong' },
   mic: { ios: 'mic.fill', android: 'mic' },
   stop: { ios: 'stop.circle.fill', android: 'stop-circle' },
   refresh: { ios: 'arrow.clockwise', android: 'refresh' },

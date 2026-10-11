@@ -2,6 +2,7 @@ import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '@/api/client';
+import { holdMicrophone } from '@/features/mic-hold';
 
 /**
  * Microphone recording for voice questions and conversations. The file is uploaded once, then discarded.
@@ -14,6 +15,7 @@ export function useVoiceRecorder(maxSeconds = 300, onLimit?: (uri: string) => vo
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const stopRef = useRef<() => Promise<string | null>>(async () => null);
   const onLimitRef = useRef(onLimit);
+  const releaseMic = useRef<(() => void) | null>(null);
 
   const clearTimer = () => {
     if (timer.current) clearInterval(timer.current);
@@ -22,9 +24,13 @@ export function useVoiceRecorder(maxSeconds = 300, onLimit?: (uri: string) => vo
 
   const stop = useCallback(async (): Promise<string | null> => {
     clearTimer();
-    if (!recorder.isRecording) return null;
+    if (!recorder.isRecording) {
+      releaseMic.current?.();
+      return null;
+    }
     await recorder.stop();
     setRecording(false);
+    releaseMic.current?.();
     // Back to playback mode so spoken answers use the loudspeaker.
     await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
     return recorder.uri;
@@ -38,9 +44,17 @@ export function useVoiceRecorder(maxSeconds = 300, onLimit?: (uri: string) => vo
   const start = useCallback(async (): Promise<boolean> => {
     const permission = await requestRecordingPermissionsAsync();
     if (!permission.granted) return false;
-    await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
-    await recorder.prepareToRecordAsync();
-    recorder.record();
+    // Ask the "MindNest" listener to let go of the microphone, and give it a moment to do so.
+    releaseMic.current = holdMicrophone();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    try {
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+      await recorder.prepareToRecordAsync();
+      recorder.record();
+    } catch (err) {
+      releaseMic.current?.();
+      throw err;
+    }
     setSeconds(0);
     setRecording(true);
     timer.current = setInterval(() => {
@@ -56,7 +70,10 @@ export function useVoiceRecorder(maxSeconds = 300, onLimit?: (uri: string) => vo
     return true;
   }, [recorder, maxSeconds]);
 
-  useEffect(() => clearTimer, []);
+  useEffect(() => () => {
+    clearTimer();
+    releaseMic.current?.();
+  }, []);
 
   return { start, stop, recording, seconds };
 }

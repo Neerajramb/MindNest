@@ -191,11 +191,13 @@ class SceneResult:
         }
 
 
-def record_scene(detector: ObjectDetector, patient: Patient, jpeg: bytes, *, user: User) -> SceneResult:
+def record_scene(
+    detector: ObjectDetector, patient: Patient, jpeg: bytes, *, user: User, room_hint: str | None = None
+) -> SceneResult:
     """Live look: work out which of the patient's rooms this is, then store tracked items seen there."""
     places = {p.name: p for p in Place.objects.filter(patient=patient, is_active=True)}
     tracked = {obj.name: obj for obj in TrackedObject.objects.filter(patient=patient, is_active=True)}
-    scene = detector.describe(jpeg, sorted(tracked), sorted(places))
+    scene = detector.describe(jpeg, sorted(tracked), sorted(places), room_hint)
     place = places.get(scene.room) if scene.room else None
     label = "" if place else scene.room_guess
     observations = _store(patient, tracked, scene.detections, place=place, location_label=label, user=user)

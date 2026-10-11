@@ -12,6 +12,7 @@ import { AgendaRow } from '@/components/agenda-row';
 import { ReminderCard } from '@/components/reminder-card';
 import { SafetyBadge } from '@/components/safety-status';
 import { nextReminder } from '@/features/next-reminder';
+import { useWakeWord } from '@/features/wake-word';
 import { usePatientId } from '@/features/patient-context';
 import { formatDay, formatTime, greeting } from '@/lib/time';
 import { Button } from '@/ui/button';
@@ -37,6 +38,7 @@ export default function Home() {
   const patientId = usePatientId();
   const now = useNow();
   const me = useMyPatient();
+  const wake = useWakeWord();
   const reminders = useReminders(patientId);
   const agenda = useAgenda(patientId);
   const safety = useSafety(patientId, 60_000);
@@ -84,7 +86,7 @@ export default function Home() {
         void safety.refetch();
       }}
     >
-      <View style={{ flexDirection: 'row', paddingTop: space.xl }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, paddingTop: space.xl }}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Live camera"
@@ -107,6 +109,28 @@ export default function Home() {
             Live
           </AppText>
         </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="AR Vision"
+          accessibilityHint="Live camera that shows the names of people you know and remembers what is around you"
+          onPress={() => router.push('/ar-vision')}
+          style={({ pressed }) => ({
+            minHeight: MIN_TOUCH,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: space.sm,
+            paddingHorizontal: space.lg,
+            borderRadius: radius.pill,
+            backgroundColor: pressed ? colors.primarySoft : colors.surface,
+            borderWidth: 2,
+            borderColor: colors.primary,
+          })}
+        >
+          <NamedIcon name="vision" size={26} color={colors.primary} />
+          <AppText variant="bodyStrong" color={colors.primary}>
+            AR Vision
+          </AppText>
+        </Pressable>
       </View>
       <View style={{ gap: space.xs }}>
         <AppText variant="heading" accessibilityRole="header">
@@ -116,6 +140,12 @@ export default function Home() {
         <AppText variant="title" color={colors.textMuted}>
           {formatDay(now.toISOString(), tz)} · {formatTime(now.toISOString(), tz)}
         </AppText>
+        {wake.status === 'idle' ? (
+          <View accessible accessibilityLabel="Say MindNest, then your question" style={{ flexDirection: 'row', alignItems: 'center', gap: space.xs }}>
+            <NamedIcon name="mic" size={22} color={colors.textMuted} />
+            <AppText color={colors.textMuted}>Say “MindNest”, then your question</AppText>
+          </View>
+        ) : null}
       </View>
 
       {loading ? <LoadingState /> : null}

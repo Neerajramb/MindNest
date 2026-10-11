@@ -1,7 +1,9 @@
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -23,7 +25,7 @@ from core.request_data import field
 from core.scope import own_patient, resolve_patient
 from memory.models import Conversation, ConversationSource, Retention
 from memory.plans import suggest_reminders
-from memory.service import ingest, retire, search, text_note_segments
+from memory.service import append, ingest, retire, search, text_note_segments
 from people.models import Person
 
 
@@ -42,6 +44,24 @@ class RecordSerializer(serializers.Serializer):
     audio = serializers.FileField()
     person_id = serializers.UUIDField(required=False, allow_null=True)
     consent_confirmed = serializers.BooleanField()
+    conversation_id = serializers.UUIDField(required=False, help_text="Continue this recent recorded conversation.")
+
+
+CONTINUE_WITHIN = timedelta(hours=3)
+
+
+def _ongoing(patient: Patient, conversation_id: Any) -> Conversation | None:
+    """A recent recorded conversation of this patient that a new part may be added to."""
+    if not conversation_id:
+        return None
+    return get_object_or_404(
+        Conversation,
+        pk=conversation_id,
+        patient=patient,
+        source=ConversationSource.VOICE,
+        retention_status=Retention.ACTIVE,
+        ended_at__gte=timezone.now() - CONTINUE_WITHIN,
+    )
 
 
 class NoteSerializer(serializers.Serializer):
@@ -87,6 +107,7 @@ class RecordConversationView(APIView):
         patient = own_patient(user)
         _require_consent(field(request, "consent_confirmed"))
         person = _person(patient, field(request, "person_id"))
+        ongoing = _ongoing(patient, field(request, "conversation_id"))
         audio, extension = read_audio(request.FILES.get("audio"))
         try:
             segments = transcribe_conversation(audio, extension)
@@ -94,9 +115,12 @@ class RecordConversationView(APIView):
             raise ServiceUnavailable("I couldn't understand the recording right now. Please try again later.") from exc
         if not segments:
             raise ValidationError({"audio": "I couldn't hear any words in that recording."})
-        conversation = ingest(
-            get_embedder(), patient, segments, source=ConversationSource.VOICE, person=person, user=user
-        )
+        if ongoing is not None:
+            conversation = append(get_embedder(), ongoing, segments, person=person, user=user)
+        else:
+            conversation = ingest(
+                get_embedder(), patient, segments, source=ConversationSource.VOICE, person=person, user=user
+            )
         data = conversation_summary(conversation, include_text=True)
         data["suggested_reminders"] = suggest_reminders(patient, segments, person)
         return Response(data, status=status.HTTP_201_CREATED)

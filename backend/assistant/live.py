@@ -7,6 +7,7 @@ never stored; tracked items seen are saved as ordinary observations, so "Where a
 
 from typing import Any
 
+from django.core.cache import cache
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -23,12 +24,13 @@ from core.media import read_image, to_jpeg_bytes
 from core.permissions import IsPatient, user_of
 from core.scope import own_patient
 from objects_ai.service import SceneResult, record_scene
-from people.service import Recognition, recognize
+from people.service import Recognition, recognize, recognize_all
 
 
 class LookSerializer(serializers.Serializer):
     image = serializers.FileField()
     scene = serializers.BooleanField(default=False)
+    room_hint = serializers.CharField(required=False, allow_blank=True, max_length=120)
 
 
 def _join(items: list[str]) -> str:
@@ -88,7 +90,13 @@ class LiveLookView(APIView):
         scene_failed = False
         if serializer.validated_data["scene"]:
             try:
-                scene = record_scene(get_object_detector(), patient, to_jpeg_bytes(rgb), user=user)
+                scene = record_scene(
+                    get_object_detector(),
+                    patient,
+                    to_jpeg_bytes(rgb),
+                    user=user,
+                    room_hint=serializer.validated_data.get("room_hint") or None,
+                )
             except AIUnavailable:
                 scene_failed = True
 
@@ -99,3 +107,42 @@ class LiveLookView(APIView):
             "scene_failed": scene_failed,
         }
         return Response(data)
+
+
+class FacesSerializer(serializers.Serializer):
+    image = serializers.FileField()
+
+
+AR_AUDIT_SECONDS = 300  # one audit entry per person per five minutes, not one per frame
+
+
+@extend_schema(tags=["assistant"])
+class LiveFacesView(APIView):
+    """AR Vision: every familiar face in one frame, with where it is, for name tags over the live camera.
+
+    Runs locally on the server (no AI quota), so the phone can send a frame every second or two.
+    """
+
+    permission_classes = [IsPatient]
+    parser_classes = [MultiPartParser, FormParser]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "live"
+
+    @extend_schema(request={"multipart/form-data": FacesSerializer})
+    def post(self, request: Request) -> Response:
+        user = user_of(request)
+        patient = own_patient(user)
+        serializer = FacesSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        rgb = read_image(serializer.validated_data["image"])
+        try:
+            seen = recognize_all(get_face_engine(), patient, rgb)
+        except FaceModelsMissing:
+            seen = []
+        for face in seen:
+            person = face.recognition.person
+            if person is not None and cache.add(f"ar-face:{patient.pk}:{person.pk}", 1, AR_AUDIT_SECONDS):
+                log_event(
+                    "face.recognition", actor=user, patient=patient, result="RECOGNIZED", person=person.name, ar=True
+                )
+        return Response({"faces": [face.as_dict() for face in seen]})

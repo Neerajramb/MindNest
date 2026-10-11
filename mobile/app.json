@@ -69,11 +69,24 @@
         {
           "microphonePermission": "MindNest uses the microphone to hear your questions and, when everyone agrees, to save conversations."
         }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "MindNest uses the microphone to hear your questions and, when everyone agrees, to save conversations.",
+          "speechRecognitionPermission": "MindNest listens for its name while the app is open, so you can ask questions without touching the phone."
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2592e72c-6f64-4450-ac6f-42ab1e55c280"
+      }
+    },
+    "owner": "neerajramb"
   }
 }

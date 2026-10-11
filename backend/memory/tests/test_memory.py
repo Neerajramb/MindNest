@@ -203,12 +203,12 @@ def test_note_suggests_future_plans_as_reminders(world: dict[str, Any], monkeypa
         return {"plans": [plan, plan, past, {"title": "Bad", "date": "soon", "time": "4pm"}, "junk"]}
 
     monkeypatch.setattr("memory.plans.generate_json", fake_llm)
-    response = _note(world, "We are going to the park later")
+    response = _note(world, "We are going to the park at four")
     assert response.status_code == 201
     assert response.json()["data"]["suggested_reminders"] == [
         {"title": "Go to the park", "date": later.date().isoformat(), "time": f"{later:%H:%M}"}
     ]
-    assert "You: We are going to the park later" in prompts[0]
+    assert "You: We are going to the park at four" in prompts[0]
     assert f"{now:%d %B %Y}" in prompts[0]
 
 
@@ -216,3 +216,46 @@ def test_note_still_saves_when_plan_extraction_is_unavailable(world: dict[str, A
     response = _note(world, "We are going to the park at 4pm")
     assert response.status_code == 201
     assert response.json()["data"]["suggested_reminders"] == []
+
+
+def test_plan_finder_skips_the_model_when_no_time_is_mentioned(
+    world: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def must_not_call(*args: Any) -> dict[str, Any]:
+        raise AssertionError("no clock time in the conversation, so no model call")
+
+    monkeypatch.setattr("memory.plans.generate_json", must_not_call)
+    assert _note(world, "Sarah brought mangoes from the market").json()["data"]["suggested_reminders"] == []
+
+
+def _record(world: dict[str, Any], client: str = "pat_client", **extra: Any) -> Any:
+    audio = SimpleUploadedFile("part.m4a", b"fake-audio", content_type="audio/mp4")
+    return world[client].post(
+        "/api/v1/conversations/record", {"audio": audio, "consent_confirmed": "true", **extra}, format="multipart"
+    )
+
+
+def test_recorded_parts_continue_one_conversation(
+    world: dict[str, Any], monkeypatch: pytest.MonkeyPatch, sarah: Person
+) -> None:
+    parts = iter([[Segment("PATIENT", "Hello Sarah")], [Segment("OTHER", "We met at the temple")]])
+    monkeypatch.setattr("memory.views.transcribe_conversation", lambda audio, ext: next(parts))
+    first = _record(world).json()["data"]
+    second = _record(world, conversation_id=first["id"], person_id=str(sarah.id)).json()["data"]
+    assert second["id"] == first["id"]
+    assert [m["text"] for m in second["messages"]] == ["Hello Sarah", "We met at the temple"]
+    conversation = Conversation.objects.get()
+    assert conversation.recognized_person == sarah
+    assert Memory.objects.filter(conversation=conversation).count() == 2
+
+
+def test_only_own_recent_recordings_can_be_continued(world: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    monkeypatch.setattr("memory.views.transcribe_conversation", lambda audio, ext: [Segment("PATIENT", "Hi")])
+    mine = _record(world).json()["data"]["id"]
+    assert _record(world, "other_client", conversation_id=mine).status_code == 404
+    Conversation.objects.filter(pk=mine).update(ended_at=timezone.now() - timedelta(hours=4))
+    assert _record(world, conversation_id=mine).status_code == 404

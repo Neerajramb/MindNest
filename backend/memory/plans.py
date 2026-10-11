@@ -4,6 +4,7 @@ The model only suggests: nothing is scheduled until the patient taps "Add remind
 recording never creates a reminder on its own (ADR-0007 keeps structured data out of the LLM's hands).
 """
 
+import re
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
@@ -16,6 +17,12 @@ from care.models import Patient
 from memory.service import speaker_label
 from people.models import Person
 
+# Plans need a clock time; most of a conversation has none, so the model is only asked when one may be there.
+TIME_WORDS = re.compile(
+    r"\d|o'?clock|noon|midnight|half past|quarter (?:past|to)|"
+    r"\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b",
+    re.IGNORECASE,
+)
 MAX_PLANS = 5
 MAX_DAYS_AHEAD = 7
 
@@ -50,6 +57,8 @@ def suggest_reminders(
     tz = ZoneInfo(patient.timezone)
     local_now = (now or timezone.now()).astimezone(tz)
     transcript = "\n".join(f"{speaker_label(s.speaker, person)}: {s.text}" for s in segments)
+    if not TIME_WORDS.search(transcript):
+        return []
     prompt = f"Now: {local_now:%A %d %B %Y, %H:%M}.\n\nConversation:\n{transcript}"
     try:
         raw = generate_json(SYSTEM, prompt, SCHEMA).get("plans")

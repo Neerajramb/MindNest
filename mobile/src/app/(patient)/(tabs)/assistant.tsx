@@ -7,6 +7,7 @@ import { errorMessage } from '@/api/client';
 import { askAssistant, startSession, type AssistantAnswer } from '@/api/assistant';
 import { useMyPatient } from '@/api/hooks';
 import { uploadAudio, useVoiceRecorder } from '@/features/voice-recorder';
+import { useWakeWord } from '@/features/wake-word';
 import { formatAgo } from '@/lib/time';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -31,6 +32,7 @@ export default function Assistant() {
   const params = useLocalSearchParams<{ personId?: string; personName?: string }>();
   const voice = useMyPatient().data?.voice_responses_enabled ?? true;
   const recorder = useVoiceRecorder(30);
+  const wake = useWakeWord();
   const session = useRef<string | undefined>(undefined);
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
@@ -99,6 +101,9 @@ export default function Assistant() {
         large
         accessibilityHint="Tap, say your question, then tap again"
       />
+      {wake.status === 'idle' ? (
+        <AppText color={colors.textMuted}>On any screen, you can also just say “MindNest” and then your question.</AppText>
+      ) : null}
       <TextField
         label="Or type your question"
         value={query}

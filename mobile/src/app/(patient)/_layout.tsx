@@ -5,9 +5,11 @@ import { useCallback, useEffect } from 'react';
 
 import { qk, useMyPatient, useReminders } from '@/api/hooks';
 import { useAuth } from '@/auth/auth-context';
+import { WakeWordCard } from '@/components/wake-word-card';
 import { useLocationReporting } from '@/features/location-reporting';
 import { usePatientId } from '@/features/patient-context';
 import { useReminderNotifications } from '@/features/reminder-notifications';
+import { WakeWordProvider } from '@/features/wake-word';
 import { TextScaleProvider } from '@/ui/text-scale';
 import { colors } from '@/ui/theme';
 
@@ -40,28 +42,32 @@ export default function PatientLayout() {
 
   return (
     <TextScaleProvider scale={Number(me.data?.text_scale ?? 1)}>
-      <Stack
-        screenOptions={{
-          headerShadowVisible: false,
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.primary,
-          headerTitleStyle: { fontSize: 22, color: colors.text },
-          headerBackButtonDisplayMode: 'minimal',
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="medications" options={{ title: 'My medicines' }} />
-        <Stack.Screen name="safety" options={{ title: 'Where am I' }} />
-        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
-        <Stack.Screen name="help" options={{ title: 'Help' }} />
-        <Stack.Screen name="who-is-this" options={{ title: 'Who is this?' }} />
-        <Stack.Screen name="find" options={{ title: 'Find my things' }} />
-        <Stack.Screen name="scan" options={{ title: 'Scan a room' }} />
-        <Stack.Screen name="memory" options={{ title: 'My memories' }} />
-        <Stack.Screen name="live" options={{ title: 'Live' }} />
-        <Stack.Screen name="add-reminder" options={{ title: 'Add a reminder' }} />
-      </Stack>
+      <WakeWordProvider>
+        <Stack
+          screenOptions={{
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.primary,
+            headerTitleStyle: { fontSize: 22, color: colors.text },
+            headerBackButtonDisplayMode: 'minimal',
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="medications" options={{ title: 'My medicines' }} />
+          <Stack.Screen name="safety" options={{ title: 'Where am I' }} />
+          <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+          <Stack.Screen name="help" options={{ title: 'Help' }} />
+          <Stack.Screen name="who-is-this" options={{ title: 'Who is this?' }} />
+          <Stack.Screen name="find" options={{ title: 'Find my things' }} />
+          <Stack.Screen name="scan" options={{ title: 'Scan a room' }} />
+          <Stack.Screen name="memory" options={{ title: 'My memories' }} />
+          <Stack.Screen name="live" options={{ title: 'Live' }} />
+          <Stack.Screen name="add-reminder" options={{ title: 'Add a reminder' }} />
+          <Stack.Screen name="ar-vision" options={{ headerShown: false }} />
+        </Stack>
+        <WakeWordCard />
+      </WakeWordProvider>
     </TextScaleProvider>
   );
 }

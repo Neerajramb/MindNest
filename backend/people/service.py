@@ -2,12 +2,13 @@
 
 from dataclasses import dataclass
 from typing import Any
+from uuid import UUID
 
 import numpy as np
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
-from ai.face import MODEL_NAME, MODEL_VERSION, FaceEngine, best_match, confidence_label
+from ai.face import MODEL_NAME, MODEL_VERSION, FaceEngine, Match, best_match, confidence_label
 from care.models import Patient
 from people.models import FaceEmbedding, Person
 
@@ -69,6 +70,65 @@ class Recognition:
         }
 
 
+def _candidates(patient: Patient) -> list[tuple[UUID, np.ndarray]]:
+    """Recognition vectors of this patient's active registered people only (scope before matching)."""
+    return [
+        (e.person_id, e.as_array())
+        for e in FaceEmbedding.objects.filter(person__patient=patient, person__is_active=True).only(
+            "person_id", "vector"
+        )
+    ]
+
+
+MAX_AR_FACES = 5
+
+
+@dataclass
+class SeenFace:
+    """One face in an AR Vision frame. `box` is x, y, width, height as fractions of the upright image."""
+
+    box: tuple[float, float, float, float]
+    recognition: Recognition
+
+    def as_dict(self) -> dict[str, Any]:
+        data = self.recognition.as_dict()
+        return {
+            "box": [round(v, 4) for v in self.box],
+            "status": data["status"],
+            "person": data["person"],
+            "confidence": data["confidence"],
+        }
+
+
+def recognize_all(engine: FaceEngine, patient: Patient, rgb: np.ndarray) -> list[SeenFace]:
+    """Every clear face in the frame (largest first, at most MAX_AR_FACES), named only above the threshold.
+
+    A person can appear once: if two faces match the same person, only the closer match keeps the name.
+    """
+    height, width = rgb.shape[:2]
+    candidates = _candidates(patient)
+    found: list[tuple[tuple[float, float, float, float], Match | None]] = []
+    for face in [f for f in engine.detect(rgb) if f.good_quality][:MAX_AR_FACES]:
+        x, y, w, h = (float(v) for v in face.box[:4])
+        box = (max(x, 0.0) / width, max(y, 0.0) / height, w / width, h / height)
+        match = best_match(engine.embed(rgb, face), candidates)
+        found.append((box, match if match and match.similarity >= settings.FACE_MATCH_THRESHOLD else None))
+
+    best: dict[UUID, float] = {}
+    for _, match in found:
+        if match is not None:
+            best[match.person_id] = max(best.get(match.person_id, -1.0), match.similarity)
+    people = Person.objects.in_bulk(list(best))
+    seen: list[SeenFace] = []
+    for box, match in found:
+        if match is None or match.similarity < best[match.person_id]:
+            seen.append(SeenFace(box, Recognition("UNKNOWN")))
+        else:
+            person = people[match.person_id]
+            seen.append(SeenFace(box, Recognition("RECOGNIZED", person, confidence_label(match.similarity))))
+    return seen
+
+
 def recognize(engine: FaceEngine, patient: Patient, rgb: np.ndarray) -> Recognition:
     """Compare the largest clear face with this patient's registered people only.
 
@@ -80,14 +140,7 @@ def recognize(engine: FaceEngine, patient: Patient, rgb: np.ndarray) -> Recognit
     face = faces[0]
     if not face.good_quality:
         return Recognition("UNCLEAR")
-    query = engine.embed(rgb, face)
-    candidates = [
-        (e.person_id, e.as_array())
-        for e in FaceEmbedding.objects.filter(person__patient=patient, person__is_active=True).only(
-            "person_id", "vector"
-        )
-    ]
-    match = best_match(query, candidates)
+    match = best_match(engine.embed(rgb, face), _candidates(patient))
     if match is None or match.similarity < settings.FACE_MATCH_THRESHOLD:
         return Recognition("UNKNOWN")
     person = Person.objects.get(pk=match.person_id)

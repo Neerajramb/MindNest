@@ -26,10 +26,11 @@ class FakeDetector:
     def detect(self, jpeg: bytes, vocabulary: list[str]) -> list[Detection]:
         raise AssertionError("live looks use describe()")
 
-    def describe(self, jpeg: bytes, vocabulary: list[str], places: list[str]) -> Scene:
+    def describe(self, jpeg: bytes, vocabulary: list[str], places: list[str], room_hint: str | None = None) -> Scene:
         if self.fail:
             raise AIUnavailable("down")
         self.calls.append((vocabulary, places))
+        self.hint = room_hint
         return self.scene
 
 
@@ -132,3 +133,27 @@ def test_live_look_is_for_the_patient_only(
 ) -> None:
     response = world["carol_client"].post("/api/v1/live/look", {"image": _photo()}, format="multipart")
     assert response.status_code == 403
+
+
+def test_room_hint_is_passed_to_the_vision_model(
+    world: dict[str, Any], home: dict[str, Any], detector: FakeDetector, faces: dict[str, Any]
+) -> None:
+    assert _look(world, scene="true", room_hint="Kitchen").status_code == 200
+    assert detector.hint == "Kitchen"
+
+
+def test_scene_prompt_mentions_only_known_rooms(monkeypatch: pytest.MonkeyPatch) -> None:
+    from ai import objects
+
+    prompts: list[str] = []
+
+    def fake_generate(contents: list[Any], **kwargs: Any) -> str:
+        prompts.append(contents[-1])
+        return '{"room": "Kitchen", "room_guess": "a kitchen", "items": [], "others": []}'
+
+    monkeypatch.setattr(objects, "image_part", lambda jpeg: jpeg)
+    monkeypatch.setattr(objects, "generate", fake_generate)
+    objects._describe(b"jpeg", ["keys"], ["Kitchen", "Study"], room_hint="Study")
+    objects._describe(b"jpeg", ["keys"], ["Kitchen", "Study"], room_hint="Garage")
+    assert "A moment ago the person was in the Study." in prompts[0]
+    assert "A moment ago" not in prompts[1]

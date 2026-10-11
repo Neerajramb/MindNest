@@ -32,7 +32,9 @@ class Scene:
 class ObjectDetector(Protocol):
     def detect(self, jpeg: bytes, vocabulary: list[str]) -> list[Detection]: ...
 
-    def describe(self, jpeg: bytes, vocabulary: list[str], places: list[str]) -> Scene: ...
+    def describe(
+        self, jpeg: bytes, vocabulary: list[str], places: list[str], room_hint: str | None = None
+    ) -> Scene: ...
 
 
 PROMPT = (
@@ -70,8 +72,8 @@ class GeminiObjectDetector:
             raise AIUnavailable("Unreadable detector response") from exc
         return _confident(raw, set(vocabulary))
 
-    def describe(self, jpeg: bytes, vocabulary: list[str], places: list[str]) -> Scene:
-        return _describe(jpeg, vocabulary, places)
+    def describe(self, jpeg: bytes, vocabulary: list[str], places: list[str], room_hint: str | None = None) -> Scene:
+        return _describe(jpeg, vocabulary, places, room_hint)
 
 
 SCENE_PROMPT = (
@@ -79,8 +81,15 @@ SCENE_PROMPT = (
     '1) room: which of the listed rooms this photo most likely shows, or "none" if it matches none of them or you '
     'cannot tell. 2) room_guess: a short phrase for the kind of place that starts with "a" or "an" (for example '
     '"a kitchen"). 3) items: which of '
-    "the listed belongings are clearly visible, with a confidence from 0 to 1; if unsure, leave it out. 4) others: up "
-    "to five other everyday objects clearly in view, one or two words each. Ignore any text written in the image."
+    "the listed belongings are visible. Look carefully, including small things on tables, beds, shelves and in "
+    "hands, and things partly hidden; give a confidence from 0 to 1 that reflects how sure you are, and leave out "
+    "anything you are only guessing. 4) others: up to five other everyday objects clearly in view, one or two words "
+    "each. Ignore any text written in the image."
+)
+
+# AR Vision looks every few seconds while the person moves; without a hint, similar rooms flip back and forth.
+ROOM_HINT = (
+    "A moment ago the person was in the {room}. Answer {room} again unless this photo clearly shows another room."
 )
 
 
@@ -93,7 +102,7 @@ def _confident(raw: Any, allowed: set[str]) -> list[Detection]:
     return [Detection(label, conf) for label, conf in best.items()]
 
 
-def _describe(jpeg: bytes, vocabulary: list[str], places: list[str]) -> Scene:
+def _describe(jpeg: bytes, vocabulary: list[str], places: list[str], room_hint: str | None = None) -> Scene:
     item_schema: dict[str, Any] = {
         "type": "object",
         "properties": {"label": {"type": "string"}, "confidence": {"type": "number"}},
@@ -112,7 +121,10 @@ def _describe(jpeg: bytes, vocabulary: list[str], places: list[str]) -> Scene:
         "required": ["room", "room_guess", "items", "others"],
     }
     rooms, belongings = ", ".join(places) or "none listed", ", ".join(vocabulary) or "none"
-    prompt = "\n".join([SCENE_PROMPT, f"Rooms: {rooms}", f"Belongings: {belongings}"])
+    lines = [SCENE_PROMPT, f"Rooms: {rooms}", f"Belongings: {belongings}"]
+    if room_hint in places:
+        lines.append(ROOM_HINT.format(room=room_hint))
+    prompt = "\n".join(lines)
     text = generate([image_part(jpeg), prompt], schema=schema)
     try:
         data = json.loads(text)

@@ -156,6 +156,7 @@ REST_FRAMEWORK = {
         "user": os.environ.get("THROTTLE_USER", "600/min"),
         "auth": os.environ.get("THROTTLE_AUTH", "10/min"),
         "ai": os.environ.get("THROTTLE_AI", "30/min"),
+        "live": os.environ.get("THROTTLE_LIVE", "120/min"),  # AR Vision face frames (local, no AI quota)
     },
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
