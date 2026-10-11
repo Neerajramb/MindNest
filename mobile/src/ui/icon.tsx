@@ -67,6 +67,10 @@ export const icons = {
   trash: { ios: 'trash', android: 'delete' },
   speaker: { ios: 'speaker.wave.2.fill', android: 'volume-up' },
   map: { ios: 'map.fill', android: 'map' },
+  camera: { ios: 'camera.fill', android: 'photo-camera' },
+  mic: { ios: 'mic.fill', android: 'mic' },
+  stop: { ios: 'stop.circle.fill', android: 'stop-circle' },
+  refresh: { ios: 'arrow.clockwise', android: 'refresh' },
 } as const satisfies Record<string, { ios: SFSymbol; android: MaterialName }>;
 
 export type IconName = keyof typeof icons;

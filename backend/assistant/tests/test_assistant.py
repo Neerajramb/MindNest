@@ -11,6 +11,7 @@ import ai.embeddings
 from ai.gemini import AIUnavailable
 from ai.speech import Segment
 from ai.testing import WordOverlapEmbedder
+from assistant.answers import _target_day
 from assistant.router import Intent, classify
 from memory.service import ingest
 from objects_ai.models import ObjectObservation, Place, TrackedObject
@@ -209,3 +210,54 @@ def test_voice_query_and_access_control(
     assert response.json()["data"]["intent"] == Intent.OBJECT
     assert world["carol_client"].post("/api/v1/assistant/query", {"query": "hi"}, format="json").status_code == 403
     assert world["pat_client"].post("/api/v1/assistant/query", {"query": "  "}, format="json").status_code == 400
+
+
+def test_questions_without_memory_words_are_answered_from_saved_conversations(
+    world: dict[str, Any], day: dict[str, Any], fake_embedder: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Device finding: "Who is having breakfast with me?" went to general chat and never saw the recording.
+    _remember(world, "Neeraj is going to have breakfast with me on Monday morning", None, fake_embedder)
+
+    def fake_llm(system: str, prompt: str, schema: dict[str, Any]) -> dict[str, Any]:
+        if "Memory excerpts" not in prompt:
+            return {"answer": "I don't know."}
+        return {"found": True, "answer": "Neeraj is having breakfast with you on Monday.", "used_ids": ["M1"]}
+
+    monkeypatch.setattr("assistant.answers.generate_json", fake_llm)
+    assert classify(world["pat"], "Who is having breakfast with me?") == Intent.GENERAL
+    general = _ask(world, "Who is having breakfast with me?")
+    assert general["intent"] == Intent.MEMORY
+    assert general["answer"] == "Neeraj is having breakfast with you on Monday."
+
+    schedule = _ask(world, "What am I doing for breakfast on Monday?")
+    assert schedule["intent"] == Intent.SCHEDULE
+    assert "From your conversations: Neeraj is having breakfast with you on Monday." in schedule["answer"]
+    assert schedule["sources"][-1]["type"] == "memory"
+
+
+def test_schedule_answer_without_a_matching_memory_is_unchanged(
+    world: dict[str, Any], day: dict[str, Any], fake_embedder: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _remember(world, "The electrician comes on Tuesday", day["sarah"], fake_embedder)
+    monkeypatch.setattr("assistant.answers.generate_json", lambda *a: {"found": False, "answer": "", "used_ids": []})
+    data = _ask(world, "What do I have today?")
+    assert "From your conversations" not in data["answer"] and data["used_llm"] is False
+
+
+@pytest.mark.parametrize(
+    "question,expected",
+    [
+        ("What do I have on Monday?", (date(2026, 10, 12), "on Monday")),
+        ("Anything on Sunday?", (date(2026, 10, 11), "tomorrow")),
+        ("What about Saturday?", (date(2026, 10, 10), "for the rest of today")),
+        ("What do I have tomorrow?", (date(2026, 10, 11), "tomorrow")),
+    ],
+)
+def test_schedule_questions_can_name_a_weekday(question: str, expected: tuple[date, str]) -> None:
+    assert _target_day(question, date(2026, 10, 10)) == expected  # a Saturday
+
+
+def test_removed_people_still_route_questions_to_their_memories(world: dict[str, Any], day: dict[str, Any]) -> None:
+    day["sarah"].is_active = False
+    day["sarah"].save(update_fields=["is_active"])
+    assert classify(world["pat"], "What cake is Sarah bringing?") == Intent.MEMORY

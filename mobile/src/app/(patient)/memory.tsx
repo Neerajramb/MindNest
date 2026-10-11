@@ -24,7 +24,6 @@ export default function Memory() {
   const tz = useMyPatient().data?.timezone;
   const conversations = useConversations(patientId);
   const people = usePeopleList(patientId);
-  const recorder = useVoiceRecorder(300);
   const [personId, setPersonId] = useState<string>('none');
   const [consent, setConsent] = useState(false);
   const [note, setNote] = useState('');
@@ -36,15 +35,7 @@ export default function Memory() {
   });
   const refresh = () => void client.invalidateQueries({ queryKey: ['patient', patientId ?? '', 'conversations'] });
 
-  const toggleRecording = async () => {
-    setMessage(null);
-    if (!recorder.recording) {
-      if (!consent) return setMessage({ text: 'First confirm that everyone agreed to be recorded.', tone: 'danger' });
-      if (!(await recorder.start())) setMessage({ text: 'MindNest needs the microphone. You can type a note instead.', tone: 'danger' });
-      return;
-    }
-    const uri = await recorder.stop();
-    if (!uri) return;
+  const saveRecording = async (uri: string) => {
     setBusy(true);
     try {
       await uploadAudio('/conversations/record', uri, extra());
@@ -56,6 +47,19 @@ export default function Memory() {
     } finally {
       setBusy(false);
     }
+  };
+  // At the five-minute limit the recording stops by itself and is saved like a normal stop.
+  const recorder = useVoiceRecorder(300, (uri) => void saveRecording(uri));
+
+  const toggleRecording = async () => {
+    setMessage(null);
+    if (!recorder.recording) {
+      if (!consent) return setMessage({ text: 'First confirm that everyone agreed to be recorded.', tone: 'danger' });
+      if (!(await recorder.start())) setMessage({ text: 'MindNest needs the microphone. You can type a note instead.', tone: 'danger' });
+      return;
+    }
+    const uri = await recorder.stop();
+    if (uri) await saveRecording(uri);
   };
 
   const saveNote = async () => {

@@ -3,13 +3,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '@/api/client';
 
-/** Microphone recording for voice questions and conversations. The file is uploaded once, then discarded. */
-export function useVoiceRecorder(maxSeconds = 300) {
+/**
+ * Microphone recording for voice questions and conversations. The file is uploaded once, then discarded.
+ * `onLimit` receives the file when the time limit stops the recording, so long conversations are not lost.
+ */
+export function useVoiceRecorder(maxSeconds = 300, onLimit?: (uri: string) => void) {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const stopRef = useRef<() => Promise<string | null>>(async () => null);
+  const onLimitRef = useRef(onLimit);
 
   const clearTimer = () => {
     if (timer.current) clearInterval(timer.current);
@@ -28,7 +32,8 @@ export function useVoiceRecorder(maxSeconds = 300) {
 
   useEffect(() => {
     stopRef.current = stop;
-  }, [stop]);
+    onLimitRef.current = onLimit;
+  }, [stop, onLimit]);
 
   const start = useCallback(async (): Promise<boolean> => {
     const permission = await requestRecordingPermissionsAsync();
@@ -40,7 +45,11 @@ export function useVoiceRecorder(maxSeconds = 300) {
     setRecording(true);
     timer.current = setInterval(() => {
       setSeconds((s) => {
-        if (s + 1 >= maxSeconds) void stopRef.current();
+        if (s + 1 >= maxSeconds) {
+          void stopRef.current().then((uri) => {
+            if (uri) onLimitRef.current?.(uri);
+          });
+        }
         return s + 1;
       });
     }, 1000);

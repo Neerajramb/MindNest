@@ -1,6 +1,8 @@
 """Intent routing: decide which source answers a question (AI spec sections 10 and 13).
 
-Rules first, because they are fast, testable and never hallucinate. Only memory and general chat reach the LLM.
+Rules first, because they are fast, testable and never hallucinate. Saved conversations are also consulted for
+schedule, appointment, general and untracked-item questions (see `answers.answer`), because people rarely phrase
+"what did someone tell me" questions with memory words.
 """
 
 import re
@@ -58,6 +60,9 @@ SCHEDULE = (
     r"routine",
     r"this (morning|afternoon|evening)",
     r"what should i do",
+    r"(mon|tues|wednes|thurs|fri|satur|sun)day",
+    r"this week",
+    r"weekend",
 )
 MEMORY = (
     r"talk(ed)?",
@@ -78,8 +83,9 @@ MEMORY = (
 
 
 def mentioned_person(patient: Patient, text: str) -> Person | None:
+    """A registered person named in the question. Removed people still count: their saved memories remain."""
     lowered = f" {text.lower()} "
-    for person in Person.objects.filter(patient=patient, is_active=True):
+    for person in Person.objects.filter(patient=patient).order_by("-is_active", "name"):
         names = [person.name.lower(), person.name.lower().split()[0]]
         if person.relationship:
             names.append(person.relationship.lower())

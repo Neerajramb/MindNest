@@ -11,7 +11,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from accounts.models import User
-from ai.objects import ObjectDetector
+from ai.objects import Detection, ObjectDetector
 from audit.service import log_event
 from care.models import Patient
 from objects_ai.models import ObjectObservation, ObservationSource, Place, TrackedObject
@@ -54,7 +54,11 @@ def latest_observation(obj: TrackedObject) -> ObjectObservation | None:
 def _where(observation: ObjectObservation) -> str:
     if observation.place:
         return f"in the {observation.place.name.lower()}"
-    return f"at {observation.location_label}" if observation.location_label else "somewhere I could not name"
+    label = observation.location_label
+    if not label:
+        return "somewhere I could not name"
+    # Live looks store a kind of room ("a kitchen") when it is none of the patient's named places.
+    return f"in {label}" if label.startswith(("a ", "an ")) else f"at {label}"
 
 
 def _when(observation: ObjectObservation, tz: ZoneInfo, now: datetime) -> str:
@@ -121,20 +125,17 @@ def last_seen_answer(patient: Patient, obj: TrackedObject | None, *, now: dateti
     return LastSeenAnswer("FOUND", answer, obj, observation, stale)
 
 
-def record_scan(
-    detector: ObjectDetector,
+def _store(
     patient: Patient,
-    jpeg: bytes,
+    tracked: dict[str, TrackedObject],
+    detections: list[Detection],
     *,
     place: Place | None,
     location_label: str,
     user: User,
 ) -> list[ObjectObservation]:
-    """Run detection on one frame and store an observation for each tracked object seen confidently enough."""
-    tracked = {obj.name: obj for obj in TrackedObject.objects.filter(patient=patient, is_active=True)}
-    detections = detector.detect(jpeg, sorted(tracked))
     scan_id, now = uuid.uuid4(), timezone.now()
-    observations = [
+    return [
         ObjectObservation.objects.create(
             tracked_object=tracked[d.label],
             patient=patient,
@@ -149,6 +150,21 @@ def record_scan(
         for d in detections
         if d.label in tracked and d.confidence >= settings.OBJECT_MIN_CONFIDENCE
     ]
+
+
+def record_scan(
+    detector: ObjectDetector,
+    patient: Patient,
+    jpeg: bytes,
+    *,
+    place: Place | None,
+    location_label: str,
+    user: User,
+) -> list[ObjectObservation]:
+    """Run detection on one frame and store an observation for each tracked object seen confidently enough."""
+    tracked = {obj.name: obj for obj in TrackedObject.objects.filter(patient=patient, is_active=True)}
+    detections = detector.detect(jpeg, sorted(tracked))
+    observations = _store(patient, tracked, detections, place=place, location_label=location_label, user=user)
     log_event(
         "objects.scanned",
         actor=user,
@@ -157,3 +173,38 @@ def record_scan(
         found=sorted(o.tracked_object.name for o in observations),
     )
     return observations
+
+
+@dataclass
+class SceneResult:
+    place: Place | None
+    location_label: str
+    observations: list[ObjectObservation]
+    others: list[str]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "place": {"id": str(self.place.id), "name": self.place.name} if self.place else None,
+            "location_label": self.location_label,
+            "found": sorted(o.tracked_object.name for o in self.observations),
+            "others": self.others,
+        }
+
+
+def record_scene(detector: ObjectDetector, patient: Patient, jpeg: bytes, *, user: User) -> SceneResult:
+    """Live look: work out which of the patient's rooms this is, then store tracked items seen there."""
+    places = {p.name: p for p in Place.objects.filter(patient=patient, is_active=True)}
+    tracked = {obj.name: obj for obj in TrackedObject.objects.filter(patient=patient, is_active=True)}
+    scene = detector.describe(jpeg, sorted(tracked), sorted(places))
+    place = places.get(scene.room) if scene.room else None
+    label = "" if place else scene.room_guess
+    observations = _store(patient, tracked, scene.detections, place=place, location_label=label, user=user)
+    log_event(
+        "objects.scanned",
+        actor=user,
+        patient=patient,
+        place=place.name if place else label,
+        found=sorted(o.tracked_object.name for o in observations),
+        live=True,
+    )
+    return SceneResult(place, label, observations, scene.others)

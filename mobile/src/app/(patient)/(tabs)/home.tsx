@@ -2,8 +2,9 @@ import * as Location from 'expo-location';
 import * as Speech from 'expo-speech';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Pressable, View } from 'react-native';
 
+import { useConversations } from '@/api/assistant';
 import { errorMessage } from '@/api/client';
 import { useAcknowledgeReminder, useAgenda, useMyPatient, useReminders, useSafety, useSnoozeReminder } from '@/api/hooks';
 import type { AgendaItem } from '@/api/types';
@@ -15,10 +16,11 @@ import { usePatientId } from '@/features/patient-context';
 import { formatDay, formatTime, greeting } from '@/lib/time';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
+import { NamedIcon } from '@/ui/icon';
 import { Screen } from '@/ui/screen';
 import { ErrorState, InlineNotice, LoadingState } from '@/ui/states';
 import { AppText } from '@/ui/text';
-import { colors, space } from '@/ui/theme';
+import { colors, MIN_TOUCH, radius, space } from '@/ui/theme';
 
 function useNow(intervalMs = 30_000): Date {
   const [now, setNow] = useState(() => new Date());
@@ -40,6 +42,8 @@ export default function Home() {
   const safety = useSafety(patientId, 60_000);
   const ack = useAcknowledgeReminder(patientId);
   const snooze = useSnoozeReminder(patientId);
+  const conversations = useConversations(patientId);
+  const savedCount = conversations.data?.conversations.length ?? 0;
   const [locationPermission, setLocationPermission] = useState<Location.PermissionStatus | null>(null);
 
   useEffect(() => {
@@ -80,7 +84,31 @@ export default function Home() {
         void safety.refetch();
       }}
     >
-      <View style={{ gap: space.xs, paddingTop: space.xxl }}>
+      <View style={{ flexDirection: 'row', paddingTop: space.xl }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Live camera"
+          accessibilityHint="Tells you which room you are in, what is around you and who you are with"
+          onPress={() => router.push('/live')}
+          style={({ pressed }) => ({
+            minHeight: MIN_TOUCH,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: space.sm,
+            paddingHorizontal: space.lg,
+            borderRadius: radius.pill,
+            backgroundColor: pressed ? colors.primarySoft : colors.surface,
+            borderWidth: 2,
+            borderColor: colors.primary,
+          })}
+        >
+          <NamedIcon name="camera" size={26} color={colors.primary} />
+          <AppText variant="bodyStrong" color={colors.primary}>
+            Live
+          </AppText>
+        </Pressable>
+      </View>
+      <View style={{ gap: space.xs }}>
         <AppText variant="heading" accessibilityRole="header">
           {greeting(tz, now)}
           {name ? `, ${name}` : ''}
@@ -142,6 +170,21 @@ export default function Home() {
           <Button label="Share my location" icon="safety" onPress={askLocation} />
         </Card>
       ) : null}
+
+      <Card>
+        <View style={{ flexDirection: 'row', gap: space.md, alignItems: 'center' }}>
+          <NamedIcon name="mic" size={30} color={colors.primary} />
+          <View style={{ flex: 1 }}>
+            <AppText variant="title" accessibilityRole="header">
+              My memories
+            </AppText>
+            <AppText color={colors.textMuted}>
+              {savedCount ? `${savedCount} saved ${savedCount === 1 ? 'conversation' : 'conversations'}` : 'Record a conversation so I can remind you later'}
+            </AppText>
+          </View>
+        </View>
+        <Button label="Live recording" icon="mic" onPress={() => router.push('/memory')} />
+      </Card>
 
       <View style={{ gap: space.md }}>
         <Button label="Find my things" icon="safety" onPress={() => router.push('/find')} large />

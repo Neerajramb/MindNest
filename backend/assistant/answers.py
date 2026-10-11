@@ -1,8 +1,9 @@
 """Answer builders. Structured answers are templated from database rows (ADR-0007, BR-05); only memory and general
 questions use the language model, and memory answers must cite the excerpts they were given (RAG-06/07)."""
 
+import re
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -61,14 +62,32 @@ def _day(moment: datetime, tz: ZoneInfo, now: datetime) -> str:
     return moment.astimezone(tz).strftime("on %A %d %B")
 
 
+WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+
+def _target_day(question: str, today: date) -> tuple[date, str]:
+    """The day a schedule question is about: today, tomorrow or the next named weekday."""
+    text = question.lower()
+    if "tomorrow" in text:
+        return today + timedelta(days=1), "tomorrow"
+    for index, name in enumerate(WEEKDAYS):
+        if re.search(rf"\b{name}\b", text):
+            ahead = (index - today.weekday()) % 7
+            if ahead == 0:
+                return today, "for the rest of today"
+            if ahead == 1:
+                return today + timedelta(days=1), "tomorrow"
+            return today + timedelta(days=ahead), f"on {name.capitalize()}"
+    return today, "for the rest of today"
+
+
 def schedule_answer(patient: Patient, question: str, now: datetime) -> Answer:
     tz = ZoneInfo(patient.timezone)
-    tomorrow = "tomorrow" in question.lower()
-    day = (now.astimezone(tz) + timedelta(days=1 if tomorrow else 0)).date()
+    today = now.astimezone(tz).date()
+    day, label = _target_day(question, today)
     items = build_agenda(patient, day)
-    if not tomorrow:
+    if day == today:
         items = [i for i in items if (i.end_at or i.at) >= now]
-    label = "tomorrow" if tomorrow else "for the rest of today"
     if not items:
         return Answer(Intent.SCHEDULE, f"You have nothing planned {label}.")
     parts = [f"{_clock(i.at, tz)} {i.title}" + (f" at {i.location}" if i.location else "") for i in items[:6]]
@@ -219,11 +238,18 @@ def _excerpts(hits: list[Hit], tz: ZoneInfo) -> str:
 
 
 def memory_answer(patient: Patient, question: str, context_person: Person | None, now: datetime) -> Answer:
+    return find_memory(patient, question, context_person, now) or Answer(Intent.MEMORY, NO_MEMORY, confidence="low")
+
+
+def find_memory(
+    patient: Patient, question: str, context_person: Person | None, now: datetime, *, quote_on_outage: bool = True
+) -> Answer | None:
+    """A grounded answer from saved conversations, or None when they don't answer the question."""
     tz = ZoneInfo(patient.timezone)
     person = mentioned_person(patient, question) or context_person
     hits = search(get_embedder(), patient, question, person=person)
     if not hits:
-        return Answer(Intent.MEMORY, NO_MEMORY, confidence="low")
+        return None
     ids = {f"M{i}": hit for i, hit in enumerate(hits, start=1)}
     sources = [
         {
@@ -240,6 +266,8 @@ def memory_answer(patient: Patient, question: str, context_person: Person | None
     try:
         result = generate_json(MEMORY_SYSTEM, prompt, MEMORY_SCHEMA)
     except AIUnavailable:
+        if not quote_on_outage:
+            return None
         top = hits[0].memory
         who = f" with {top.recognized_person.name}" if top.recognized_person else ""
         return Answer(
@@ -253,7 +281,7 @@ def memory_answer(patient: Patient, question: str, context_person: Person | None
     answer_text = str(result.get("answer", "")).strip()
     # Grounding check: an answer must rest on at least one excerpt we actually supplied.
     if not result.get("found") or not used or not answer_text:
-        return Answer(Intent.MEMORY, NO_MEMORY, confidence="low", used_llm=True)
+        return None
     best = max(ids[i].score for i in used)
     return Answer(
         Intent.MEMORY,
@@ -285,8 +313,27 @@ def general_answer(question: str) -> Answer:
     return Answer(Intent.GENERAL, text or GENERAL_FALLBACK, confidence="medium", used_llm=bool(text))
 
 
+def with_memory(base: Answer, memory: Answer | None) -> Answer:
+    """Add what saved conversations say to a structured answer, e.g. a visit someone mentioned for Monday."""
+    if memory is None:
+        return base
+    return Answer(
+        base.intent,
+        f"{base.text} From your conversations: {memory.text}",
+        confidence=base.confidence,
+        used_llm=True,
+        sources=[*base.sources, *memory.sources],
+        action=base.action,
+    )
+
+
 def answer(patient: Patient, question: str, intent: Intent, *, context_person: Person | None = None) -> Answer:
     now = timezone.now()
+
+    def memory() -> Answer | None:
+        # Supplementary lookups stay quiet during an LLM outage instead of quoting a loosely related excerpt.
+        return find_memory(patient, question, context_person, now, quote_on_outage=False)
+
     if intent == Intent.MEDICAL_ADVICE:
         return Answer(Intent.MEDICAL_ADVICE, ADVICE)
     if intent == Intent.HELP:
@@ -298,15 +345,19 @@ def answer(patient: Patient, question: str, intent: Intent, *, context_person: P
             action={"type": "OPEN_SCREEN", "screen": "/who-is-this"},
         )
     if intent == Intent.OBJECT:
+        # An untracked item ("where is the party?") may still be answered by something someone said.
+        if find_object(patient, question) is None:
+            return memory() or object_answer(patient, question)
         return object_answer(patient, question)
     if intent == Intent.MEDICATION:
         return medication_answer(patient, now)
     if intent == Intent.APPOINTMENT:
-        return appointment_answer(patient, now)
+        return with_memory(appointment_answer(patient, now), memory())
     if intent == Intent.REMINDER:
         return reminder_answer(patient, now)
     if intent == Intent.SCHEDULE:
-        return schedule_answer(patient, question, now)
+        return with_memory(schedule_answer(patient, question, now), memory())
     if intent == Intent.MEMORY:
         return memory_answer(patient, question, context_person, now)
-    return general_answer(question)
+    # "Who is having breakfast with me?" has no memory words but is answered by a saved conversation.
+    return memory() or general_answer(question)
