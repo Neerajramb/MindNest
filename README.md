@@ -78,4 +78,4 @@ See [docs/SETUP.md](docs/SETUP.md).
 | Known issues | [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) |
 | Phase reports | [docs/phase-reports/](docs/phase-reports/) |
 
-<img src="./.github/assets/footer.svg" width="100%" alt="MindNest · made with care — a team project; I worked on the AI and machine learning."/>
+<img src="./.github/assets/footer-v2.svg" width="100%" alt="MindNest · made with care — reminders, familiar faces and memories, kept close."/>
